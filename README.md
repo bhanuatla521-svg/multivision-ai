@@ -751,17 +751,24 @@ The control dashboard is accessible at `/ai-models` and contains 8 tabs:
 
 ---
 
-## 🤝 Open Source Attribution
+## 🤝 Open Source & Technology
 
-MultiVision AI is built upon and extends the **MultiVision** open-source foundation, adapting its core agent architecture into a dedicated multimodal routing and observability control center.
+MultiVision AI is a substantially modified and extended multimodal AI platform built from an open-source foundation. It adapts the underlying agent architecture into a dedicated multimodal routing, research, knowledge discovery, and observability control center.
 
-**Core Open Source Libraries:**
-- **FastAPI / Starlette:** [https://fastapi.tiangolo.com/](https://fastapi.tiangolo.com/)
-- **Uvicorn:** [https://www.uvicorn.org/](https://www.uvicorn.org/)
-- **Pydantic:** [https://docs.pydantic.dev/](https://docs.pydantic.dev/)
-- **ChromaDB & FastEmbed:** [https://www.trychroma.com/](https://www.trychroma.com/)
-- **HTTPX:** [https://www.python-httpx.org/](https://www.python-httpx.org/)
-- **PyPDF:** [https://pypdf.readthedocs.io/](https://pypdf.readthedocs.io/)
+### Core Open Source Libraries
+
+- **FastAPI / Starlette:** https://fastapi.tiangolo.com/
+- **Uvicorn:** https://www.uvicorn.org/
+- **Pydantic:** https://docs.pydantic.dev/
+- **ChromaDB & FastEmbed:** https://www.trychroma.com/
+- **HTTPX:** https://www.python-httpx.org/
+- **PyPDF:** https://pypdf.readthedocs.io/
+
+### Open Source Attribution
+
+MultiVision AI incorporates and extends open-source software. The applicable original licenses, copyright notices, and required attributions are preserved in the repository.
+
+For details, see the project's `LICENSE` and attribution files.
 
 ---
 
