@@ -2,8 +2,8 @@
 // Slash command handlers and dispatcher, extracted from chat.js
 
 window.cancelActiveTour = function cancelActiveTour() {
-  document.querySelectorAll('.odysseus-highlight, .odysseus-highlight-click')
-    .forEach(e => e.classList.remove('odysseus-highlight', 'odysseus-highlight-click'));
+  document.querySelectorAll('.multivision-highlight, .multivision-highlight-click')
+    .forEach(e => e.classList.remove('multivision-highlight', 'multivision-highlight-click'));
   document.querySelectorAll('.tour-halo').forEach(e => e.remove());
   document.getElementById('tour-tooltip')?.remove();
   document.body?.classList.remove('tour-active');
@@ -164,7 +164,7 @@ function _normalizeSetupBaseUrl(raw) {
 }
 
 function _clearSetupGuideMessages() {
-  Storage.remove('odysseus-setup-guide-messages');
+  Storage.remove('multivision-setup-guide-messages');
 }
 
 async function _showSetupRetryPrompt() {
@@ -1269,7 +1269,7 @@ async function _cmdWorkspace(args, ctx) {
     // folder, sensitive dir, filesystem root).
     workspaceModule.vetAndSetWorkspace(rest).then(({ ok, path }) => {
       if (ok) slashReply(`Workspace set: <code>${uiModule.esc(path)}</code>`);
-      else slashReply(`Not a usable workspace folder on the Odysseus backend: <code>${uiModule.esc(rest)}</code>. If Odysseus is running in Docker, use the container path, usually <code>/app</code>, or use <code>/workspace pick</code>.`);
+      else slashReply(`Not a usable workspace folder on the MultiVision backend: <code>${uiModule.esc(rest)}</code>. If MultiVision is running in Docker, use the container path, usually <code>/app</code>, or use <code>/workspace pick</code>.`);
     });
     return true;
   }
@@ -2124,8 +2124,8 @@ async function _cmdDemo(args, ctx) {
   let _draftObserver = null;
   let _draftPoll = null;
   const _clearTour = () => {
-    document.querySelectorAll('.odysseus-highlight, .odysseus-highlight-click').forEach(e => {
-      e.classList.remove('odysseus-highlight', 'odysseus-highlight-click');
+    document.querySelectorAll('.multivision-highlight, .multivision-highlight-click').forEach(e => {
+      e.classList.remove('multivision-highlight', 'multivision-highlight-click');
     });
     document.querySelectorAll('.tour-halo').forEach(e => e.remove());
     document.getElementById('tour-tooltip')?.remove();
@@ -2311,7 +2311,7 @@ async function _cmdDemo(args, ctx) {
   function showStep(sel, text, mode = 'next', isFirst = false, stepOpts = {}) {
     return new Promise(resolve => {
       if (cancelled) return resolve('cancel');
-      document.querySelectorAll('.odysseus-highlight').forEach(e => e.classList.remove('odysseus-highlight'));
+      document.querySelectorAll('.multivision-highlight').forEach(e => e.classList.remove('multivision-highlight'));
       document.querySelectorAll('.tour-halo').forEach(e => e.remove());
 
       // Support multiple selectors (comma-separated)
@@ -2331,7 +2331,7 @@ async function _cmdDemo(args, ctx) {
       const advanceOnClick = !!stepOpts.advanceOnClick;
       const pulseNext = !!stepOpts.pulseNext;
 
-      targets.forEach(t => t.classList.add('odysseus-highlight'));
+      targets.forEach(t => t.classList.add('multivision-highlight'));
       const halos = breathing ? targets.map(makeHalo) : [];
       // Reset tooltip into the "pre-fade" state so the new step phases in.
       tooltip.classList.remove('tour-fade-in');
@@ -2510,8 +2510,8 @@ async function _cmdDemo(args, ctx) {
     { sel: '#sidebar-new-chat-btn', text: 'Start a new chat here. <b>Click it.</b> You can do it!', mode: 'click',
       before() { if (sidebar?.classList.contains('hidden')) sidebar.classList.remove('hidden'); } },
     { sel: '#model-picker-btn',   text: 'Pick your LLM, Local or API.', advanceOnClick: true },
-    { sel: '#mode-agent-btn',     text: '<b>Agent mode</b> gives Odysseus more control of the app when your model supports tools: create a theme, download a model, make a daily task, organize things, and more.', mode: 'click' },
-    { sel: '#web-toggle-btn',     text: 'Toggle tools like <b>web search</b>. Odysseus comes with private built-in <b>SearXNG</b> search.', mode: 'click' },
+    { sel: '#mode-agent-btn',     text: '<b>Agent mode</b> gives MultiVision more control of the app when your model supports tools: create a theme, download a model, make a daily task, organize things, and more.', mode: 'click' },
+    { sel: '#web-toggle-btn',     text: 'Toggle tools like <b>web search</b>. MultiVision comes with private built-in <b>SearXNG</b> search.', mode: 'click' },
     { sel: '#overflow-plus-btn',  text: 'More tools can be found here, or in your sidebar. <b>Click to peek.</b>',
       advanceOnClick: true, pulseNext: true, afterDelay: 2200 },
     { sel: '#message',            text: 'Write your prompt here. Drag and drop files to attach them. <b>/prompt</b> for random prompt, <b>/help</b> for more.',
@@ -2531,7 +2531,7 @@ async function _cmdDemo(args, ctx) {
     await delay(step.afterDelay || 750);
     // After the message input step, wait for any active stream to finish
     if (step.sel === '#message' && _isStreamingFn()) {
-      document.querySelectorAll('.odysseus-highlight').forEach(e => e.classList.remove('odysseus-highlight'));
+      document.querySelectorAll('.multivision-highlight').forEach(e => e.classList.remove('multivision-highlight'));
       tooltip.style.display = 'none';
       await new Promise(r => {
         const check = setInterval(() => { if (!_isStreamingFn()) { clearInterval(check); r(); } }, 300);
@@ -2632,7 +2632,7 @@ async function _cmdTourCompare(args, ctx) {
   }
 
   const _clear = () => {
-    document.querySelectorAll('.odysseus-highlight').forEach(e => e.classList.remove('odysseus-highlight'));
+    document.querySelectorAll('.multivision-highlight').forEach(e => e.classList.remove('multivision-highlight'));
     _clearHalos();
     tooltip.remove();
     document.body.classList.remove('tour-active');
@@ -2910,7 +2910,7 @@ async function _cmdTourCookbook(args, ctx) {
     document.querySelectorAll('.tour-halo').forEach(e => e.remove());
   }
   const _clear = () => {
-    document.querySelectorAll('.odysseus-highlight').forEach(e => e.classList.remove('odysseus-highlight'));
+    document.querySelectorAll('.multivision-highlight').forEach(e => e.classList.remove('multivision-highlight'));
     _clearHalos();
     tooltip.remove();
     document.body.classList.remove('tour-active');
@@ -3139,7 +3139,7 @@ async function _cmdTourTheme(args, ctx) {
     document.querySelectorAll('.tour-halo').forEach(e => e.remove());
   }
   const _clear = () => {
-    document.querySelectorAll('.odysseus-highlight').forEach(e => e.classList.remove('odysseus-highlight'));
+    document.querySelectorAll('.multivision-highlight').forEach(e => e.classList.remove('multivision-highlight'));
     _clearHalos();
     tooltip.remove();
     document.body.classList.remove('tour-active');
@@ -3540,7 +3540,7 @@ async function _cmdTourGallery(args, ctx) {
     _msgEl.value = '';
     _msgEl.dispatchEvent(new Event('input', { bubbles: true }));
   }
-  try { localStorage.setItem('odysseus-notes-first-open-hint-v1', '1'); } catch (_) {}
+  try { localStorage.setItem('multivision-notes-first-open-hint-v1', '1'); } catch (_) {}
   document.getElementById('notes-first-open-hint')?.remove();
 
   if (!document.getElementById('tour-styles')) {
@@ -4361,7 +4361,7 @@ async function _cmdTourTask1(args, ctx) {
       text: 'Tasks are <b>paused by default</b> — resume whichever ones make sense for you. (Or pause anything that\'s running.)' },
     { sel: '#tasks-modal .modal-body',
       text: 'When enabled, Tasks use the <b>utility model configured in Settings</b> for cleanup and organization jobs.' },
-  ], 'Use Tasks when you want Odysseus to handle background housekeeping.', {
+  ], 'Use Tasks when you want MultiVision to handle background housekeeping.', {
     continueLabel: 'continue →',
     continueText: '<b>Part 1 done.</b> Want to keep going into <b>adding & managing tasks</b>?',
   });
@@ -4474,7 +4474,7 @@ async function _cmdTourResearch(args, ctx) {
     document.querySelectorAll('.tour-halo').forEach(e => e.remove());
   }
   const _clear = () => {
-    document.querySelectorAll('.odysseus-highlight').forEach(e => e.classList.remove('odysseus-highlight'));
+    document.querySelectorAll('.multivision-highlight').forEach(e => e.classList.remove('multivision-highlight'));
     _clearHalos();
     tooltip.remove();
     document.body.classList.remove('tour-active');
@@ -4688,7 +4688,7 @@ async function _cmdTourLibrary(args, ctx) {
     document.querySelectorAll('.tour-halo').forEach(e => e.remove());
   }
   const _clear = () => {
-    document.querySelectorAll('.odysseus-highlight').forEach(e => e.classList.remove('odysseus-highlight'));
+    document.querySelectorAll('.multivision-highlight').forEach(e => e.classList.remove('multivision-highlight'));
     _clearHalos();
     tooltip.remove();
     document.body.classList.remove('tour-active');
@@ -5275,7 +5275,7 @@ const _ODYSSEY_QUOTES = [
   "A man who has been through bitter experiences and travelled far enjoys even his sufferings after a time.",
   "For a friend with an understanding heart is worth no less than a brother.",
   "The wine urges me on, the bewitching wine, which sets even a wise man to singing and to laughing gently.",
-  "I am Odysseus, son of Laertes, known to all for my cunning. My fame reaches even unto heaven.",
+  "I am MultiVision, son of Laertes, known to all for my cunning. My fame reaches even unto heaven.",
 ];
 
 const _8BALL = [

@@ -415,7 +415,7 @@ import { wireArrowUpRecall, getUserMessagesFromChatHistory } from './composerArr
     } catch (_) {}
     if (routeSnapshot && routeSnapshot.model) return routeSnapshot.model;
     try {
-      const dc = window.__odysseusDefaultChat || JSON.parse(localStorage.getItem('odysseus-default-chat-cache') || 'null');
+      const dc = window.__odysseusDefaultChat || JSON.parse(localStorage.getItem('multivision-default-chat-cache') || 'null');
       if (dc && dc.model) return dc.model;
     } catch (_) {}
     return '';
@@ -784,7 +784,7 @@ import { wireArrowUpRecall, getUserMessagesFromChatHistory } from './composerArr
 
   // API key pattern for the guard in handleChatSubmit
   const API_KEY_RE = /^(sk-[a-zA-Z0-9_\-]{20,}|gsk_[a-zA-Z0-9]{20,}|AIza[a-zA-Z0-9_\-]{30,}|xai-[a-zA-Z0-9]{20,})$/;
-  const PLAN_STORAGE_KEY = 'odysseus-active-plan';
+  const PLAN_STORAGE_KEY = 'multivision-active-plan';
 
   const _queuedAgentRequests = [];
   let _queuedDrainTimer = null;
@@ -1261,7 +1261,7 @@ import { wireArrowUpRecall, getUserMessagesFromChatHistory } from './composerArr
         let dc = (typeof window !== 'undefined' && window.__odysseusDefaultChat) || null;
         if (!dc || !dc.endpoint_url || !dc.model) {
           try {
-            dc = JSON.parse(localStorage.getItem('odysseus-default-chat-cache') || 'null');
+            dc = JSON.parse(localStorage.getItem('multivision-default-chat-cache') || 'null');
           } catch (_) {}
         }
         try {
@@ -1273,7 +1273,7 @@ import { wireArrowUpRecall, getUserMessagesFromChatHistory } from './composerArr
             if (dc && dc.endpoint_url && dc.model) {
               try {
                 window.__odysseusDefaultChat = dc;
-                localStorage.setItem('odysseus-default-chat-cache', JSON.stringify(dc));
+                localStorage.setItem('multivision-default-chat-cache', JSON.stringify(dc));
               } catch (_) {}
             }
           }
@@ -1346,7 +1346,7 @@ import { wireArrowUpRecall, getUserMessagesFromChatHistory } from './composerArr
 
     // Acquire Web Lock to hint browser not to discard this tab while streaming
     if (navigator.locks) {
-      navigator.locks.request('odysseus-stream-' + streamSessionId, { mode: 'exclusive', ifAvailable: true }, lock => {
+      navigator.locks.request('multivision-stream-' + streamSessionId, { mode: 'exclusive', ifAvailable: true }, lock => {
         if (!lock) return; // Another stream already holds a lock — fine
         return new Promise(resolve => { _webLockRelease = resolve; });
       }).catch(e => console.warn('web lock acquire failed:', e)); // Ignore lock errors — best-effort
@@ -4000,7 +4000,7 @@ import { wireArrowUpRecall, getUserMessagesFromChatHistory } from './composerArr
             if (_box && sessionModule.getCurrentSessionId() === _timeoutSessionId) {
               var _timeoutMsg = document.createElement('div');
               _timeoutMsg.className = 'msg msg-ai';
-              _timeoutMsg.innerHTML = '<div class="role">Odysseus</div><div class="body" style="opacity:0.6;font-style:italic;">Research clarification timed out. Toggle research again to start over.</div>';
+              _timeoutMsg.innerHTML = '<div class="role">MultiVision</div><div class="body" style="opacity:0.6;font-style:italic;">Research clarification timed out. Toggle research again to start over.</div>';
               _box.appendChild(_timeoutMsg);
               uiModule.scrollHistory();
             }

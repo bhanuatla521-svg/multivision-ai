@@ -32,7 +32,7 @@ import { nextToolWindowZ } from './toolWindowZOrder.js';
 
 const _state = new Map(); // id -> { restoreFn, closeFn, railBtnId, isMinimized, restoreMinHeight }
 
-const _rememberedDockKey = (id) => `odysseus-modal-remembered-dock-${id}`;
+const _rememberedDockKey = (id) => `multivision-modal-remembered-dock-${id}`;
 function _rememberDock(id, side) {
   if (!id || !side) return;
   try { localStorage.setItem(_rememberedDockKey(id), side); } catch (_) {}

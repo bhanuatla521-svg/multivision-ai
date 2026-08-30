@@ -26,7 +26,7 @@ const SIDEBAR_MAX_VISIBLE = 10;
 const FOLDER_MAX_VISIBLE = 5;
 let _showAllSessions = false;
 let _expandedFolders = {};  // folderName -> true if "show more" clicked
-let _sortMode = Storage.get('odysseus-session-sort') || 'active'; // default to last active
+let _sortMode = Storage.get('multivision-session-sort') || 'active'; // default to last active
 const DATE_SECTION_COLLAPSE_KEY = 'ody-session-date-section-collapsed';
 let _autoCreateInProgress = false; // guard against recursive auto-create
 const _INCOGNITO_SESSIONS_KEY = 'ody-incognito-sessions'; // sessionStorage key for incognito session IDs
@@ -342,8 +342,8 @@ function _normalizeSessionsList(fetched) {
 export function initDependencies() {}
 
 // ── Folder state persistence ──
-const FOLDER_STATE_KEY = 'odysseus-folder-state';
-const FOLDER_ORDER_KEY = 'odysseus-folder-order';
+const FOLDER_STATE_KEY = 'multivision-folder-state';
+const FOLDER_ORDER_KEY = 'multivision-folder-order';
 
 function loadFolderState() {
   return Storage.getJSON(FOLDER_STATE_KEY, {});
@@ -1840,7 +1840,7 @@ export async function selectSession(id, { keepSidebar = false, showLoading = tru
     try { window.__odysseusLastSelectedSessionId = id; } catch (_) {}
     // Identify Assistant / task-output sessions so we don't "trap" the user
     // there on return. Skipped from both `lastSessionId` persistence and the
-    // URL hash — the user complained that coming back to Odysseus kept
+    // URL hash — the user complained that coming back to MultiVision kept
     // landing them on the auto-firing task-log chat instead of their last
     // real conversation.
     const _meta = sessions.find(s => s.id === id);
@@ -2091,7 +2091,7 @@ export async function selectSession(id, { keepSidebar = false, showLoading = tru
     if (window.documentModule) {
       const docBtn = document.getElementById('overflow-doc-btn');
       const meta = sessions.find(s => s.id === id);
-      const shouldOpen = localStorage.getItem('odysseus-doc-open-' + id) === '1';
+      const shouldOpen = localStorage.getItem('multivision-doc-open-' + id) === '1';
       const hasDocs = !!(meta && meta.has_documents);
       if (docBtn) {
         docBtn.classList.remove('active');
@@ -2155,7 +2155,7 @@ async function _getPreferredDefaultChat() {
   } catch (_) {}
   if (!dc || !dc.endpoint_url || !dc.model) {
     try {
-      dc = JSON.parse(localStorage.getItem('odysseus-default-chat-cache') || 'null');
+      dc = JSON.parse(localStorage.getItem('multivision-default-chat-cache') || 'null');
     } catch (_) {}
   }
   if (dc && dc.endpoint_url && dc.model) return dc;
@@ -2165,7 +2165,7 @@ async function _getPreferredDefaultChat() {
     if (dc && dc.endpoint_url && dc.model) {
       try {
         window.__odysseusDefaultChat = dc;
-        localStorage.setItem('odysseus-default-chat-cache', JSON.stringify(dc));
+        localStorage.setItem('multivision-default-chat-cache', JSON.stringify(dc));
       } catch (_) {}
       return dc;
     }
@@ -3613,8 +3613,8 @@ export function closeArchive() {
 export function getSortMode() { return _sortMode; }
 export function setSortMode(mode) {
   _sortMode = mode || null;
-  if (mode) Storage.set('odysseus-session-sort', mode);
-  else Storage.remove('odysseus-session-sort');
+  if (mode) Storage.set('multivision-session-sort', mode);
+  else Storage.remove('multivision-session-sort');
   renderSessionList();
 }
 

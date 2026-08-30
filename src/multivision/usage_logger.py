@@ -18,7 +18,7 @@ from src.multivision.provider_health import record_provider_event
 logger = logging.getLogger(__name__)
 
 # DB File path
-_DATA_DIR = os.getenv("ODYSSEUS_DATA_DIR", "data")
+_DATA_DIR = os.getenv("MULTIVISION_DATA_DIR", "data")
 _LOG_FILE = os.path.join(_DATA_DIR, "ai_usage_logs.jsonl")
 _DB_FILE = os.path.join(_DATA_DIR, "multivision_usage.db")
 

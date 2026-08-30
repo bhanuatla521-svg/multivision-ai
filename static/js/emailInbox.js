@@ -281,7 +281,7 @@ function _bindEvents() {
     });
   }
 
-  // Delay the lightweight unread badge check so opening Odysseus doesn't
+  // Delay the lightweight unread badge check so opening MultiVision doesn't
   // compete with the initial chat/session paint. The full email list now loads
   // only when the inbox is actually opened.
   setTimeout(_refreshUnreadCount, 8000);
@@ -334,7 +334,7 @@ async function _refreshUnreadCount() {
     }
 
     // Compare highest unread UID to the last-seen threshold in localStorage
-    const lastSeen = parseInt(localStorage.getItem('odysseus-email-last-seen-uid') || '0', 10);
+    const lastSeen = parseInt(localStorage.getItem('multivision-email-last-seen-uid') || '0', 10);
     const maxUid = parseInt(data.max_uid || '0', 10) || 0;
 
     // Only show dot if there's a new email above the threshold
@@ -372,7 +372,7 @@ export function markInboxAsSeen() {
       .then(data => {
         const maxUid = parseInt(data.max_uid || '0', 10) || 0;
         if (maxUid > 0) {
-          localStorage.setItem('odysseus-email-last-seen-uid', String(maxUid));
+          localStorage.setItem('multivision-email-last-seen-uid', String(maxUid));
         }
         const dot = document.getElementById('email-unread-dot');
         if (dot) dot.style.display = 'none';

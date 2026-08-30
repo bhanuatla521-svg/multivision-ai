@@ -151,7 +151,7 @@ def _shell_path(p: str) -> str:
 def _local_tooling_path_export(executable: str) -> str:
     """Bash line prepending the running interpreter's bin dir to PATH.
 
-    When Odysseus runs from a virtualenv, that bin dir holds the tools the
+    When MultiVision runs from a virtualenv, that bin dir holds the tools the
     cookbook runners shell out to (`hf`, `python`). tmux runners start from a
     fresh login shell with the venv NOT activated, so without this they can't
     find `hf` and downloads fail with "hf: command not found" — notably on
@@ -283,7 +283,7 @@ def _venv_safe_local_pip_install_cmd(cmd: str, *, local: bool, in_venv: bool) ->
 
     Cookbook dependency installs run through the model-serve task path so users
     can watch progress in the same log UI. For local POSIX runs, that task
-    prepends Odysseus' own interpreter directory to PATH. If Odysseus itself is
+    prepends MultiVision' own interpreter directory to PATH. If MultiVision itself is
     running from a venv, `python3` resolves to the venv Python and pip rejects
     `--user` with "User site-packages are not visible in this virtualenv".
 
@@ -541,7 +541,7 @@ def _cached_model_scan_script(model_dirs: list[str] | None = None, add_hf_cache:
         "    return int(n)",
         "def scan_ollama():",
         "    if any(m.get('is_ollama') for m in models): return",
-        "    if os.name == 'nt' and not os.environ.get('ODYSSEUS_ALLOW_OLLAMA_CLI_SCAN'): return",
+        "    if os.name == 'nt' and not os.environ.get('MULTIVISION_ALLOW_OLLAMA_CLI_SCAN'): return",
         "    if not shutil.which('ollama'): return",
         "    try:",
         "        p = subprocess.run(['ollama', 'list'], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, timeout=6)",
@@ -673,7 +673,7 @@ def _ollama_bind_from_cmd(cmd: str | None, *, default_host: str = "127.0.0.1") -
     """Return the Ollama bind host/port requested by a serve command.
 
     Plain local `ollama serve` defaults to loopback. Remote callers can pass a
-    wider default host so the resulting API is reachable by Odysseus.
+    wider default host so the resulting API is reachable by MultiVision.
     """
     if not cmd:
         return default_host, "11434"
@@ -809,7 +809,7 @@ def _append_serve_preflight_exit_lines(runner_lines: list[str], *, keep_shell_op
 
 def _append_vllm_linux_preflight_lines(runner_lines: list[str]) -> None:
     """Append Linux vLLM readiness lines that identify the runtime being used."""
-    # Keep the user install bin visible for Odysseus-managed `pip install --user`
+    # Keep the user install bin visible for MultiVision-managed `pip install --user`
     # installs, but then report the actual CLI path so external runtimes are clear.
     runner_lines.append('export PATH="$HOME/.local/bin:$PATH"')
     runner_lines.append('ODYSSEUS_VLLM_BIN="$(command -v vllm 2>/dev/null || true)"')
@@ -1341,12 +1341,12 @@ def _diagnose_serve_output(text: str) -> dict | None:
         ),
         (
             r"mlx-lama-swift|odysseus-mlx-inpaint|mlx-lama-serve|LaMa / MI-GAN MLX inpainting models require",
-            "LaMa / MI-GAN MLX inpainting requires an Odysseus-compatible mlx-lama-swift bridge on this Apple Silicon server.",
+            "LaMa / MI-GAN MLX inpainting requires an MultiVision-compatible mlx-lama-swift bridge on this Apple Silicon server.",
             [{"label": "build mlx-lama-swift bridge and put odysseus-mlx-inpaint or mlx-lama-serve on PATH", "op": "dependency", "package": "mlx_lama_swift"}],
         ),
         (
             r"mlx-ddcolor-swift|odysseus-mlx-colorize|mlx-ddcolor-serve|DDColor MLX models require",
-            "DDColor MLX colorization requires an Odysseus-compatible mlx-ddcolor-swift bridge on this Apple Silicon server.",
+            "DDColor MLX colorization requires an MultiVision-compatible mlx-ddcolor-swift bridge on this Apple Silicon server.",
             [{"label": "build mlx-ddcolor-swift bridge and put odysseus-mlx-colorize or mlx-ddcolor-serve on PATH", "op": "dependency", "package": "mlx_ddcolor_swift"}],
         ),
         (
@@ -1354,7 +1354,7 @@ def _diagnose_serve_output(text: str) -> dict | None:
             "MLX-LM tried to quantize an already-quantized DeepSeek switch layer.",
             [
                 {"label": "relaunch from the cached local Hugging Face snapshot path on this Mac", "op": "manual"},
-                {"label": "Odysseus now rewrites MLX repo-id launches to a cached snapshot when one exists", "op": "manual"},
+                {"label": "MultiVision now rewrites MLX repo-id launches to a cached snapshot when one exists", "op": "manual"},
             ],
         ),
         # System build deps come BEFORE the generic llama.cpp catch-all so

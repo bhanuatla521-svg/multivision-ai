@@ -1,5 +1,5 @@
 // ============================================
-// Odysseus UI — Main Application Orchestrator
+// MultiVision UI — Main Application Orchestrator
 // ES6 module — entry point, no exports (wires all modules together)
 // ============================================
 import Storage from './js/storage.js';
@@ -208,7 +208,7 @@ const el = uiModule.el;
 // went stale when the user changed their default model).
 let _defaultChat = null;
 try {
-  const cachedDefaultChat = JSON.parse(localStorage.getItem('odysseus-default-chat-cache') || 'null');
+  const cachedDefaultChat = JSON.parse(localStorage.getItem('multivision-default-chat-cache') || 'null');
   if (cachedDefaultChat && cachedDefaultChat.endpoint_url && cachedDefaultChat.model) {
     _defaultChat = cachedDefaultChat;
     window.__odysseusDefaultChat = cachedDefaultChat;
@@ -221,7 +221,7 @@ async function _refreshDefaultChat() {
       _defaultChat = d;
       try {
         window.__odysseusDefaultChat = d;
-        localStorage.setItem('odysseus-default-chat-cache', JSON.stringify(d));
+        localStorage.setItem('multivision-default-chat-cache', JSON.stringify(d));
       } catch (_) {}
       return d;
     }
@@ -512,7 +512,7 @@ function initializeEventListeners() {
       e.stopPropagation();
       exportMenu.classList.remove('open');
       const meta = sessionModule.getSessions().find(s => s.id === sessionModule.getCurrentSessionId());
-      const sessionName = meta ? meta.name : 'Odysseus Chat';
+      const sessionName = meta ? meta.name : 'MultiVision Chat';
       const originalTitle = document.title;
       document.title = sessionName;
       const chatHistory = document.getElementById('chat-history');
@@ -1474,7 +1474,7 @@ function initializeEventListeners() {
     modelSortDropdown.querySelectorAll('.sort-option').forEach(opt => {
       opt.addEventListener('click', () => {
         const mode = opt.dataset.sort;
-        Storage.set('odysseus-model-sort', mode);
+        Storage.set('multivision-model-sort', mode);
         if (modelsModule) modelsModule.refreshModels();
         modelSortDropdown.style.display = 'none';
         uiModule.showToast('Models sorted: ' + opt.textContent.trim().toLowerCase());
@@ -1893,7 +1893,7 @@ function initializeEventListeners() {
   })();
 
   // ── Tool splash explainer messages (shown first 2 times per tool) ──
-  const SPLASH_COUNT_KEY = 'odysseus-tool-splash-counts';
+  const SPLASH_COUNT_KEY = 'multivision-tool-splash-counts';
   const SPLASH_MAX = 2;
   const _toolSplashes = {
     web: { role: 'Web Search', text: 'Searches the web for relevant information to include in the response. Results are fetched and summarized before the AI answers.' },
@@ -2711,7 +2711,7 @@ function initializeEventListeners() {
   }
 
   // ── UI Visibility (Customize UI modal) ──
-  const UI_VIS_KEY = 'odysseus-ui-visibility';
+  const UI_VIS_KEY = 'multivision-ui-visibility';
 
   // Selector map: key → CSS selector(s) for targets
   const UI_VIS_MAP = {
@@ -2991,7 +2991,7 @@ function initializeEventListeners() {
 
   // Migrate old toolbar visibility key if present
   (function migrateOldToolbarVis() {
-    const OLD_KEY = 'odysseus-toolbar-visibility';
+    const OLD_KEY = 'multivision-toolbar-visibility';
     try {
       const old = Storage.getJSON(OLD_KEY, null);
       if (old && typeof old === 'object') {
@@ -3687,7 +3687,7 @@ function initializeEventListeners() {
 // ============================================
 // INITIALIZATION ON PAGE LOAD
 // ============================================
-function startOdysseusApp() {
+function startMultiVisionApp() {
   tasksModule?.startNotificationPolling?.();
   if (window.__odysseusAppStarted) return;
   window.__odysseusAppStarted = true;
@@ -3746,7 +3746,7 @@ function startOdysseusApp() {
     documentModule.init(API_BASE);
     // Restore document panel if it was open before refresh
     const _curSession = sessionModule && sessionModule.getCurrentSessionId();
-    if (_curSession && localStorage.getItem('odysseus-doc-open-' + _curSession) === '1') {
+    if (_curSession && localStorage.getItem('multivision-doc-open-' + _curSession) === '1') {
       documentModule.loadSessionDocs(_curSession);
     }
   }  
@@ -4678,7 +4678,7 @@ function startOdysseusApp() {
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', startOdysseusApp, { once: true });
+  document.addEventListener('DOMContentLoaded', startMultiVisionApp, { once: true });
 } else {
-  startOdysseusApp();
+  startMultiVisionApp();
 }

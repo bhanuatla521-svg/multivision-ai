@@ -1,3 +1,6 @@
+<!-- MultiVision AI Attribution Notice -->
+> **MultiVision AI** is an independently developed application based on and substantially modified from open-source components, including Odysseus and upstream libraries.
+
 # Acknowledgments
 
 Odysseus stands on the shoulders of a lot of open-source work. This file

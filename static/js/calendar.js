@@ -637,7 +637,7 @@ function _restoreSidebar() {
 
 // ── Badge ──
 
-const BADGE_SEEN_KEY = 'odysseus-calendar-badge-seen';
+const BADGE_SEEN_KEY = 'multivision-calendar-badge-seen';
 
 function _todayStr() {
   const d = new Date();
@@ -3618,7 +3618,7 @@ function isCalendarOpen() {
 }
 
 // ── Persistent cache (localStorage) ──
-const LS_KEY = 'odysseus-calendar-cache';
+const LS_KEY = 'multivision-calendar-cache';
 const LS_TTL = 10 * 60 * 1000; // 10 min
 
 function _saveCache() {

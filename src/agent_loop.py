@@ -476,7 +476,7 @@ _DOMAIN_RULES = {
 - Tool toggles like "turn off shell/search/research" use `ui_control toggle <name> <on|off>`, not memory.""",
     "sessions": """\
 ## Chat/session rules
-- Odysseus chats are sessions. Use `list_sessions`/`manage_session`; do not shell out looking for chat files.
+- MultiVision chats are sessions. Use `list_sessions`/`manage_session`; do not shell out looking for chat files.
 - Preserve clickable session links from tool output in your final answer.""",
     "files": """\
 ## File rules
@@ -749,7 +749,7 @@ If the user asks for a reminder/alarm before the event, pass `reminder_minutes` 
 ```app_api
 {"action": "call", "method": "GET", "path": "/api/cookbook/gpus"}
 ```
-GENERIC LOOPBACK to allowed Odysseus internal endpoints. Use this whenever the user wants something the UI can do but there's NO named tool for it. Many UI buttons hit /api/* endpoints — you can hit allowed ones. Auth is handled automatically.
+GENERIC LOOPBACK to allowed MultiVision internal endpoints. Use this whenever the user wants something the UI can do but there's NO named tool for it. Many UI buttons hit /api/* endpoints — you can hit allowed ones. Auth is handled automatically.
 
 **Discovery first.** If you're not sure of the path, call `{"action":"endpoints","filter":"<keyword>"}` (e.g. filter='calendar' or 'gallery' or 'theme') to list available endpoints with their methods + summaries. Then call with action='call'.
 
@@ -1111,7 +1111,7 @@ def _explicitly_references_missing_workspace(text: str, workspace: Optional[str]
 
 def _local_computer_rules() -> str:
     return (
-        "\n\n## Odysseus Terminus local-machine mode\n"
+        "\n\n## MultiVision Terminus local-machine mode\n"
         "- The user referred to this computer/local machine or a named computer. Treat this as a machine-targeted agent task, not ordinary chat.\n"
         "- Configured Cookbook server names and SSH aliases are target machines. When the user names one, keep actions scoped to that machine.\n"
         "- For model-serving/download/cached-model tasks on a named machine, use Cookbook tools and pass the named host. Start with `list_cookbook_servers` if the exact configured host is unclear.\n"
@@ -1606,7 +1606,7 @@ def _minimal_recent_notes_tool_context_message(messages: List[Dict]) -> Optional
     return {
         "role": "user",
         "content": (
-            "Recent Odysseus tool context for follow-up references only. "
+            "Recent MultiVision tool context for follow-up references only. "
             "Use concrete note ids, calendar event uids, and email UIDs from "
             "here when the user says that note/event/reminder/appointment/"
             "email/first one/that one/it:\n"
@@ -1637,13 +1637,13 @@ def _compact_email_draft_context(raw: str, *, max_own_chars: int = 1200, max_his
     if len(own) > max_own_chars:
         own = own[:max_own_chars].rstrip() + "\n...[draft body truncated]"
     if len(history) > max_history_chars:
-        history = history[:max_history_chars].rstrip() + "\n...[quoted history truncated; full history is preserved by Odysseus]"
+        history = history[:max_history_chars].rstrip() + "\n...[quoted history truncated; full history is preserved by MultiVision]"
     if history:
         body_out = (
             f"{own}\n\n" if own else ""
         ) + (
             "QUOTED HISTORY EXCERPT FOR CONTEXT ONLY -- do not rewrite or include this excerpt in your tool output; "
-            "Odysseus preserves the full quoted thread below the reply automatically.\n"
+            "MultiVision preserves the full quoted thread below the reply automatically.\n"
             f"{history}"
         )
     else:
@@ -1652,7 +1652,7 @@ def _compact_email_draft_context(raw: str, *, max_own_chars: int = 1200, max_his
 
 
 def _minimal_odysseus_doc_messages(messages: List[Dict], active_document, stream_create: bool = False) -> List[Dict]:
-    """Tiny prompt path for the Odysseus document LoRA.
+    """Tiny prompt path for the MultiVision document LoRA.
 
     This model is trained on document tool behavior, so avoid the normal agent
     rule stack and send only the task plus the active document when editing.
@@ -1704,7 +1704,7 @@ def _minimal_odysseus_doc_messages(messages: List[Dict], active_document, stream
             "Do not use native function-call JSON or <tool_calls> markup. "
             "FIND text must be copied exactly from the active document with no labels like content:, title:, or markdown. "
             "Use only the fenced tool blocks above. Do not write anything before the fenced block. "
-            "After the tool succeeds, Odysseus will answer Done."
+            "After the tool succeeds, MultiVision will answer Done."
         )
     out = [{"role": "system", "content": system}]
     memory_message = _minimal_saved_memory_message(messages)
@@ -1756,9 +1756,9 @@ def _looks_like_notes_calendar_followup(text: str) -> bool:
 
 
 def _minimal_odysseus_notes_messages(messages: List[Dict]) -> List[Dict]:
-    """Tiny prompt path for Odysseus notes/calendar/tasks LoRAs.
+    """Tiny prompt path for MultiVision notes/calendar/tasks LoRAs.
 
-    The finetune is trained to emit Odysseus notes/calendar/task tool calls
+    The finetune is trained to emit MultiVision notes/calendar/task tool calls
     without receiving the full tool schema or saved-context wrapper stack.
     """
     latest = _extract_last_user_message(messages)
@@ -1797,11 +1797,11 @@ def _looks_like_memory_identity_turn(text: str) -> bool:
 
 
 def _minimal_odysseus_general_messages(messages: List[Dict], include_memory: bool = False) -> List[Dict]:
-    """Minimal fallback for Odysseus finetunes outside domain-specific paths."""
+    """Minimal fallback for MultiVision finetunes outside domain-specific paths."""
     latest = _extract_last_user_message(messages)
     system = (
         "You are MultiVision. Answer directly and briefly.\n"
-        "Use Odysseus tool-call format only when the user explicitly asks you to take an action.\n"
+        "Use MultiVision tool-call format only when the user explicitly asks you to take an action.\n"
         "For explicit remember/forget/preference requests, use manage_memory.\n"
         "If the user asks for their email address, email account, or connected emails, call mcp__email__list_email_accounts.\n"
         "If the user asks to read/check/show their inbox or latest emails, call mcp__email__list_emails.\n"
@@ -1865,7 +1865,7 @@ _ODY_QWEN_TEXT_FIXES = (
 
 
 def _normalize_ody_qwen_text_artifacts(text: str) -> str:
-    """Repair common dropped-final-letter artifacts from small Odysseus LoRAs.
+    """Repair common dropped-final-letter artifacts from small MultiVision LoRAs.
 
     This is intentionally scoped to the odysseus-qwen3 runtime path. It is not
     a general grammar corrector; it only fixes high-confidence standalone
@@ -2154,7 +2154,7 @@ def _build_system_prompt(
                 f'This is the current email compose window, not a normal document library item. If the user says "write", "draft", "reply", "make it say", or "write the email" without naming another target, edit THIS email draft.\n\n'
                 f'When the user asks you to write, reply to, or improve this email:\n'
                 f'1. Use `update_document` to update this email draft — keep all header lines (To, Subject, In-Reply-To, References, X-Source-UID, X-Source-Folder, X-Attachments) and the `---` separator EXACTLY as they are.\n'
-                f'2. Replace ONLY the new reply text above `---------- Previous message ----------`. You may omit the quoted history from your tool output; Odysseus preserves everything from that separator downward automatically.\n'
+                f'2. Replace ONLY the new reply text above `---------- Previous message ----------`. You may omit the quoted history from your tool output; MultiVision preserves everything from that separator downward automatically.\n'
                 f'3. Write the reply body above the quoted original. Use the saved email writing style when present.\n'
                 f'4. Identity is critical: write as the logged-in user / mailbox owner only. NEVER sign as the recipient, original sender, quoted sender, spouse, assistant, company, or any third party. If adding a signature, use only the name/signature implied by the saved email writing style.\n'
                 f'5. Mechanical style is critical: never use em dash/en dash; use --. Never use curly apostrophes. For English emails, use Hi/Hiya from the saved style rather than Hey unless the user explicitly asks for Hey.\n'
@@ -2877,7 +2877,7 @@ def _compute_final_metrics(
         tps = backend_gen_tps
     else:
         tps = output_tokens / total_duration if total_duration > 0 else 0
-    # Context % should describe the prompt Odysseus assembled, not provider
+    # Context % should describe the prompt MultiVision assembled, not provider
     # billing/usage counters. Some providers report only the final agent round
     # or cache-adjusted input, which made the displayed context jump from e.g.
     # 44% to 5% even when the session history had not meaningfully changed.
@@ -3441,7 +3441,7 @@ async def stream_agent_loop(
             and not active_email
         ):
             _relevant_tools = set(_WORKSPACE_TERMINUS_TOOLS)
-            logger.info("[tool-rag] Workspace file/terminal request; using Odysseus Terminus toolset")
+            logger.info("[tool-rag] Workspace file/terminal request; using MultiVision Terminus toolset")
 
     # If this turn targets the open document, keep editing tools available
     # regardless of which selection path (RAG, keyword, caller-provided) ran.
@@ -3948,7 +3948,7 @@ async def stream_agent_loop(
                     if s.get("function", {}).get("name") not in _ADMIN_SCHEMA_NAMES
                 ]
                 all_tool_schemas = base_schemas + mcp_schemas
-            # Odysseus-Qwen fine-tunes are trained to emit Odysseus tool calls
+            # MultiVision-Qwen fine-tunes are trained to emit MultiVision tool calls
             # from the lightweight domain prompt. Do not inject OpenAI-native
             # tool schemas; that adds prompt overhead and changes the behavior
             # we are trying to evaluate.

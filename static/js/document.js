@@ -125,8 +125,8 @@ import { bindMenuDismiss, dismissOrRemove } from './escMenuStack.js';
   const docs = new Map();           // docId -> { id, title, language, content, version, sessionId }
   let _emailSendInFlight = false;
 
-  const _docOpenKey = (sessionId) => 'odysseus-doc-open-' + sessionId;
-  const _docMinimizedKey = (sessionId) => 'odysseus-doc-minimized-' + sessionId;
+  const _docOpenKey = (sessionId) => 'multivision-doc-open-' + sessionId;
+  const _docMinimizedKey = (sessionId) => 'multivision-doc-minimized-' + sessionId;
 
   function _markDocVisibleState(sessionId, state) {
     if (!sessionId) return;
@@ -3203,7 +3203,7 @@ import { bindMenuDismiss, dismissOrRemove } from './escMenuStack.js';
 
   let _odysseusAttachMenu = null;
 
-  function _closeOdysseusAttachMenu() {
+  function _closeMultiVisionAttachMenu() {
     if (_odysseusAttachMenu) {
       _odysseusAttachMenu.remove();
       _odysseusAttachMenu = null;
@@ -3213,15 +3213,15 @@ import { bindMenuDismiss, dismissOrRemove } from './escMenuStack.js';
   }
 
   function _attachMenuOutsideClick(e) {
-    if (_odysseusAttachMenu && !_odysseusAttachMenu.contains(e.target)) _closeOdysseusAttachMenu();
+    if (_odysseusAttachMenu && !_odysseusAttachMenu.contains(e.target)) _closeMultiVisionAttachMenu();
   }
 
   function _attachMenuEscape(e) {
     if (e.key !== 'Escape') return;
-    _closeOdysseusAttachMenu();
+    _closeMultiVisionAttachMenu();
   }
 
-  function _positionOdysseusAttachMenu(anchor, menu) {
+  function _positionMultiVisionAttachMenu(anchor, menu) {
     const r = anchor?.getBoundingClientRect?.();
     if (!r) return;
     menu.style.left = `${Math.max(8, Math.min(r.left, window.innerWidth - 310))}px`;
@@ -3241,7 +3241,7 @@ import { bindMenuDismiss, dismissOrRemove } from './escMenuStack.js';
     return item.title || 'Untitled document';
   }
 
-  async function _stageOdysseusAttachment(kind, id) {
+  async function _stageMultiVisionAttachment(kind, id) {
     const doc = docs.get(activeDocId);
     if (!doc || doc.language !== 'email') return null;
     if (!doc._composeAtts) doc._composeAtts = [];
@@ -3262,11 +3262,11 @@ import { bindMenuDismiss, dismissOrRemove } from './escMenuStack.js';
     return data;
   }
 
-  async function _stageOdysseusZip(items) {
+  async function _stageMultiVisionZip(items) {
     const doc = docs.get(activeDocId);
     if (!doc || doc.language !== 'email') return null;
     if (!doc._composeAtts) doc._composeAtts = [];
-    const res = await fetch(`${API_BASE}/api/email/compose-from-odysseus-zip`, {
+    const res = await fetch(`${API_BASE}/api/email/compose-from-multivision-zip`, {
       method: 'POST',
       credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
@@ -3283,43 +3283,43 @@ import { bindMenuDismiss, dismissOrRemove } from './escMenuStack.js';
     return data;
   }
 
-  function _afterOdysseusAttachmentsAdded(count, label) {
+  function _afterMultiVisionAttachmentsAdded(count, label) {
     _renderComposeAttachments();
     clearTimeout(_autoSaveDebounce);
     _autoSaveDebounce = setTimeout(() => { saveDocument({ silent: true }); }, 800);
     if (uiModule) uiModule.showToast(count > 1 ? `Attached ${count} items` : `Attached ${label || 'item'}`);
   }
 
-  async function _attachOdysseusItem(kind, id, label, opts = {}) {
+  async function _attachMultiVisionItem(kind, id, label, opts = {}) {
     try {
-      const data = await _stageOdysseusAttachment(kind, id);
+      const data = await _stageMultiVisionAttachment(kind, id);
       if (!data) return;
-      _afterOdysseusAttachmentsAdded(1, label || data.filename);
-      if (!opts.keepOpen) _closeOdysseusAttachMenu();
+      _afterMultiVisionAttachmentsAdded(1, label || data.filename);
+      if (!opts.keepOpen) _closeMultiVisionAttachMenu();
     } catch (err) {
-      console.error('Failed to attach Odysseus item:', err);
-      if (uiModule) uiModule.showError('Failed to attach from Odysseus');
+      console.error('Failed to attach MultiVision item:', err);
+      if (uiModule) uiModule.showError('Failed to attach from MultiVision');
     }
   }
 
-  function _selectedOdysseusAttachRows(menu) {
-    return Array.from(menu?.querySelectorAll?.('.email-odysseus-attach-row.is-selected') || []);
+  function _selectedMultiVisionAttachRows(menu) {
+    return Array.from(menu?.querySelectorAll?.('.email-multivision-attach-row.is-selected') || []);
   }
 
-  function _syncOdysseusAttachSelection(menu) {
-    const selected = _selectedOdysseusAttachRows(menu);
-    const bar = menu?.querySelector?.('.email-odysseus-attach-actions');
-    const count = menu?.querySelector?.('.email-odysseus-attach-count');
-    const attachBtn = menu?.querySelector?.('.email-odysseus-attach-selected');
+  function _syncMultiVisionAttachSelection(menu) {
+    const selected = _selectedMultiVisionAttachRows(menu);
+    const bar = menu?.querySelector?.('.email-multivision-attach-actions');
+    const count = menu?.querySelector?.('.email-multivision-attach-count');
+    const attachBtn = menu?.querySelector?.('.email-multivision-attach-selected');
     if (bar) bar.style.display = '';
     if (count) count.textContent = selected.length ? `${selected.length} selected` : 'Select items to attach';
     if (attachBtn) attachBtn.disabled = selected.length === 0;
   }
 
-  async function _attachSelectedOdysseusItems(menu) {
-    const rows = _selectedOdysseusAttachRows(menu);
+  async function _attachSelectedMultiVisionItems(menu) {
+    const rows = _selectedMultiVisionAttachRows(menu);
     if (!rows.length) return;
-    const btn = menu.querySelector('.email-odysseus-attach-selected');
+    const btn = menu.querySelector('.email-multivision-attach-selected');
     if (btn) {
       btn.disabled = true;
       btn.classList.add('is-loading');
@@ -3335,19 +3335,19 @@ import { bindMenuDismiss, dismissOrRemove } from './escMenuStack.js';
           : window.confirm(`Attach ${items.length} files as one zip?`);
       }
       if (zip) {
-        await _stageOdysseusZip(items);
+        await _stageMultiVisionZip(items);
         added = 1;
       } else {
         for (const item of items) {
-          await _stageOdysseusAttachment(item.kind, item.id);
+          await _stageMultiVisionAttachment(item.kind, item.id);
           added += 1;
         }
       }
-      _afterOdysseusAttachmentsAdded(added, zip ? 'odysseus-attachments.zip' : undefined);
-      _closeOdysseusAttachMenu();
+      _afterMultiVisionAttachmentsAdded(added, zip ? 'multivision-attachments.zip' : undefined);
+      _closeMultiVisionAttachMenu();
     } catch (err) {
-      console.error('Failed to attach selected Odysseus items:', err);
-      if (uiModule) uiModule.showError(added ? `Attached ${added}, then failed` : 'Failed to attach from Odysseus');
+      console.error('Failed to attach selected MultiVision items:', err);
+      if (uiModule) uiModule.showError(added ? `Attached ${added}, then failed` : 'Failed to attach from MultiVision');
       _renderComposeAttachments();
     } finally {
       if (btn) {
@@ -3357,15 +3357,15 @@ import { bindMenuDismiss, dismissOrRemove } from './escMenuStack.js';
     }
   }
 
-  async function _loadOdysseusAttachItems(menu, kind) {
-    const list = menu.querySelector('.email-odysseus-attach-list');
+  async function _loadMultiVisionAttachItems(menu, kind) {
+    const list = menu.querySelector('.email-multivision-attach-list');
     if (!list) return;
     menu.dataset.odyAttachKind = kind;
     list.replaceChildren(spinnerModule.createLoadingRow('Loading…', 14));
     menu.querySelectorAll('[data-ody-attach-kind]').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.odyAttachKind === kind);
     });
-    const q = (menu.querySelector('.email-odysseus-attach-search')?.value || '').trim();
+    const q = (menu.querySelector('.email-multivision-attach-search')?.value || '').trim();
     try {
       const params = new URLSearchParams({ sort: 'recent', limit: '20' });
       if (q) params.set('search', q);
@@ -3379,8 +3379,8 @@ import { bindMenuDismiss, dismissOrRemove } from './escMenuStack.js';
         ? (Array.isArray(data?.items) ? data.items : Array.isArray(data?.images) ? data.images : [])
         : (Array.isArray(data?.documents) ? data.documents : Array.isArray(data?.items) ? data.items : []);
       if (!items.length) {
-        list.innerHTML = `<div class="email-odysseus-attach-empty">${q ? 'No matches' : `No ${kind === 'gallery' ? 'images' : 'documents'}`}</div>`;
-        _syncOdysseusAttachSelection(menu);
+        list.innerHTML = `<div class="email-multivision-attach-empty">${q ? 'No matches' : `No ${kind === 'gallery' ? 'images' : 'documents'}`}</div>`;
+        _syncMultiVisionAttachSelection(menu);
         return;
       }
       list.innerHTML = '';
@@ -3388,41 +3388,41 @@ import { bindMenuDismiss, dismissOrRemove } from './escMenuStack.js';
         const label = _odysseusAttachLabel(item, kind);
         const row = document.createElement('button');
         row.type = 'button';
-        row.className = `email-odysseus-attach-row ${kind === 'gallery' ? 'is-gallery' : ''}`;
+        row.className = `email-multivision-attach-row ${kind === 'gallery' ? 'is-gallery' : ''}`;
         row.dataset.id = item.id || '';
         row.dataset.kind = kind;
         if (kind === 'gallery') {
           const src = item.url ? `${API_BASE}${item.url}` : '';
           row.innerHTML = `
-            <span class="email-odysseus-attach-dot" aria-hidden="true"></span>
-            <span class="email-odysseus-attach-thumb">${src ? `<img src="${_escHtml(src)}" alt="">` : ''}</span>
-            <span class="email-odysseus-attach-main">
-              <span class="email-odysseus-attach-title">${_escHtml(label)}</span>
-              <span class="email-odysseus-attach-meta">${_escHtml(item.filename || 'image')}</span>
+            <span class="email-multivision-attach-dot" aria-hidden="true"></span>
+            <span class="email-multivision-attach-thumb">${src ? `<img src="${_escHtml(src)}" alt="">` : ''}</span>
+            <span class="email-multivision-attach-main">
+              <span class="email-multivision-attach-title">${_escHtml(label)}</span>
+              <span class="email-multivision-attach-meta">${_escHtml(item.filename || 'image')}</span>
             </span>
           `;
         } else {
           row.innerHTML = `
-            <span class="email-odysseus-attach-dot" aria-hidden="true"></span>
-            <span class="email-odysseus-attach-icon">${langIcon(item.language || 'text', 14, { style: 'opacity:0.8;' })}</span>
-            <span class="email-odysseus-attach-main">
-              <span class="email-odysseus-attach-title">${_escHtml(label)}</span>
-              <span class="email-odysseus-attach-meta">${_escHtml(item.language || 'text')}</span>
+            <span class="email-multivision-attach-dot" aria-hidden="true"></span>
+            <span class="email-multivision-attach-icon">${langIcon(item.language || 'text', 14, { style: 'opacity:0.8;' })}</span>
+            <span class="email-multivision-attach-main">
+              <span class="email-multivision-attach-title">${_escHtml(label)}</span>
+              <span class="email-multivision-attach-meta">${_escHtml(item.language || 'text')}</span>
             </span>
           `;
         }
         row.addEventListener('click', (ev) => {
           ev.preventDefault();
           row.classList.toggle('is-selected');
-          _syncOdysseusAttachSelection(menu);
+          _syncMultiVisionAttachSelection(menu);
         });
-        row.addEventListener('dblclick', () => _attachOdysseusItem(kind, item.id, label, { keepOpen: false }));
+        row.addEventListener('dblclick', () => _attachMultiVisionItem(kind, item.id, label, { keepOpen: false }));
         list.appendChild(row);
       }
-      _syncOdysseusAttachSelection(menu);
+      _syncMultiVisionAttachSelection(menu);
     } catch (err) {
-      console.error('Failed to load Odysseus attach items:', err);
-      list.innerHTML = '<div class="email-odysseus-attach-empty">Could not load</div>';
+      console.error('Failed to load MultiVision attach items:', err);
+      list.innerHTML = '<div class="email-multivision-attach-empty">Could not load</div>';
     }
   }
 
@@ -3431,15 +3431,15 @@ import { bindMenuDismiss, dismissOrRemove } from './escMenuStack.js';
       document.getElementById('doc-md-image-input')?.click();
       return;
     }
-    _closeOdysseusAttachMenu();
+    _closeMultiVisionAttachMenu();
     const menu = document.createElement('div');
-    menu.className = 'email-odysseus-attach-menu';
+    menu.className = 'email-multivision-attach-menu';
     menu.innerHTML = `
-      <button type="button" class="email-odysseus-attach-local">
+      <button type="button" class="email-multivision-attach-local">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         Upload file
       </button>
-      <div class="email-odysseus-attach-tabs">
+      <div class="email-multivision-attach-tabs">
         <button type="button" data-ody-attach-kind="document" class="active">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h6"/></svg>
           <span>Documents</span>
@@ -3449,14 +3449,14 @@ import { bindMenuDismiss, dismissOrRemove } from './escMenuStack.js';
           <span>Gallery</span>
         </button>
       </div>
-      <label class="email-odysseus-attach-search-wrap">
+      <label class="email-multivision-attach-search-wrap">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <input type="search" class="email-odysseus-attach-search" placeholder="Search attachments">
+        <input type="search" class="email-multivision-attach-search" placeholder="Search attachments">
       </label>
-      <div class="email-odysseus-attach-list"></div>
-      <div class="email-odysseus-attach-actions">
-        <span class="email-odysseus-attach-count"></span>
-        <button type="button" class="email-odysseus-attach-selected" disabled>
+      <div class="email-multivision-attach-list"></div>
+      <div class="email-multivision-attach-actions">
+        <span class="email-multivision-attach-count"></span>
+        <button type="button" class="email-multivision-attach-selected" disabled>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 17.93 8.8l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
           <span>Attach</span>
         </button>
@@ -3464,27 +3464,27 @@ import { bindMenuDismiss, dismissOrRemove } from './escMenuStack.js';
     `;
     document.body.appendChild(menu);
     _odysseusAttachMenu = menu;
-    _positionOdysseusAttachMenu(anchor, menu);
-    menu.querySelector('.email-odysseus-attach-local')?.addEventListener('click', () => {
-      _closeOdysseusAttachMenu();
+    _positionMultiVisionAttachMenu(anchor, menu);
+    menu.querySelector('.email-multivision-attach-local')?.addEventListener('click', () => {
+      _closeMultiVisionAttachMenu();
       document.getElementById('doc-email-file-input')?.click();
     });
     menu.querySelectorAll('[data-ody-attach-kind]').forEach(btn => {
-      btn.addEventListener('click', () => _loadOdysseusAttachItems(menu, btn.dataset.odyAttachKind));
+      btn.addEventListener('click', () => _loadMultiVisionAttachItems(menu, btn.dataset.odyAttachKind));
     });
     let attachSearchTimer = null;
-    menu.querySelector('.email-odysseus-attach-search')?.addEventListener('input', () => {
+    menu.querySelector('.email-multivision-attach-search')?.addEventListener('input', () => {
       clearTimeout(attachSearchTimer);
       attachSearchTimer = setTimeout(() => {
-        _loadOdysseusAttachItems(menu, menu.dataset.odyAttachKind || 'document');
+        _loadMultiVisionAttachItems(menu, menu.dataset.odyAttachKind || 'document');
       }, 220);
     });
-    menu.querySelector('.email-odysseus-attach-selected')?.addEventListener('click', () => _attachSelectedOdysseusItems(menu));
+    menu.querySelector('.email-multivision-attach-selected')?.addEventListener('click', () => _attachSelectedMultiVisionItems(menu));
     setTimeout(() => {
       document.addEventListener('click', _attachMenuOutsideClick, true);
       document.addEventListener('keydown', _attachMenuEscape, true);
     }, 0);
-    _loadOdysseusAttachItems(menu, 'document');
+    _loadMultiVisionAttachItems(menu, 'document');
   }
 
   function _isMarkdownImageFile(file) {
@@ -5717,7 +5717,7 @@ import { bindMenuDismiss, dismissOrRemove } from './escMenuStack.js';
     const editorWrap = document.getElementById('doc-editor-wrap');
     const _fontSizes = ['s', 'm', 'l'];
     const _iconSizes = [12, 14, 16];
-    let _fontIdx = parseInt(localStorage.getItem('odysseus-doc-fontsize') || '0', 10);
+    let _fontIdx = parseInt(localStorage.getItem('multivision-doc-fontsize') || '0', 10);
     if (!(_fontIdx >= 0 && _fontIdx < 3)) _fontIdx = 0;
     function _applyDocFont() {
       const richEmailBody = document.getElementById('doc-email-richbody');
@@ -5737,7 +5737,7 @@ import { bindMenuDismiss, dismissOrRemove } from './escMenuStack.js';
           el.style.display = active ? '' : 'none';
         });
       }
-      localStorage.setItem('odysseus-doc-fontsize', _fontIdx);
+      localStorage.setItem('multivision-doc-fontsize', _fontIdx);
     }
     _applyDocFont();
     // Click cycles through the sizes (S → M → L → S).
@@ -6695,7 +6695,7 @@ import { bindMenuDismiss, dismissOrRemove } from './escMenuStack.js';
   }
 
   /** Collapse action buttons into overflow "..." menu (3 most-used visible) */
-  const _DOC_RECENTS_KEY = 'odysseus-doc-actions-recent';
+  const _DOC_RECENTS_KEY = 'multivision-doc-actions-recent';
   const _DOC_MAX_VISIBLE = 2;
 
   function _getDocRecent() {
@@ -8221,16 +8221,16 @@ import { bindMenuDismiss, dismissOrRemove } from './escMenuStack.js';
     if (!activeDocId) return;
     const data = _activeSuggestions.map(s => ({ id: s.id, find: s.find, replace: s.replace, reason: s.reason }));
     if (data.length) {
-      localStorage.setItem('odysseus-suggestions-' + activeDocId, JSON.stringify(data));
+      localStorage.setItem('multivision-suggestions-' + activeDocId, JSON.stringify(data));
     } else {
-      localStorage.removeItem('odysseus-suggestions-' + activeDocId);
+      localStorage.removeItem('multivision-suggestions-' + activeDocId);
     }
   }
 
   /** Restore suggestions from localStorage for a doc */
   function _restoreSuggestionsFromStorage(docId) {
     try {
-      const raw = localStorage.getItem('odysseus-suggestions-' + docId);
+      const raw = localStorage.getItem('multivision-suggestions-' + docId);
       if (!raw) return;
       const data = JSON.parse(raw);
       if (!Array.isArray(data) || !data.length) return;

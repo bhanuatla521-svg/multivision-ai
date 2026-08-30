@@ -866,7 +866,7 @@ initMermaid();
 // the inner text content instead — same content reproduces the same hash on
 // reload. LocalStorage holds a Set of expanded hashes; we observe the chat
 // history and re-expand matching sections as they're inserted.
-const THINK_EXPANDED_KEY = 'odysseus-thinking-expanded';
+const THINK_EXPANDED_KEY = 'multivision-thinking-expanded';
 function _loadExpandedSet() {
   try { return new Set(JSON.parse(localStorage.getItem(THINK_EXPANDED_KEY) || '[]')); }
   catch { return new Set(); }

@@ -753,7 +753,7 @@ The control dashboard is accessible at `/ai-models` and contains 8 tabs:
 
 ## 🤝 Open Source Attribution
 
-MultiVision AI is built upon and extends the **Odysseus** open-source foundation, adapting its core agent architecture into a dedicated multimodal routing and observability control center.
+MultiVision AI is built upon and extends the **MultiVision** open-source foundation, adapting its core agent architecture into a dedicated multimodal routing and observability control center.
 
 **Core Open Source Libraries:**
 - **FastAPI / Starlette:** [https://fastapi.tiangolo.com/](https://fastapi.tiangolo.com/)

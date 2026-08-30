@@ -9,11 +9,11 @@ APP_VERSION = "1.0.2"
 # Base paths
 BASE_DIR = os.path.join(get_app_root(), "")
 STATIC_DIR = os.path.join(BASE_DIR, "static")
-DATA_DIR = os.getenv("ODYSSEUS_DATA_DIR", get_default_data_dir())
+DATA_DIR = os.getenv("MULTIVISION_DATA_DIR", get_default_data_dir())
 
 # Data file paths
 # Single source of truth: every persisted file/dir lives under DATA_DIR, which
-# is the ONLY place ODYSSEUS_DATA_DIR is read. Import these constants instead of
+# is the ONLY place MULTIVISION_DATA_DIR is read. Import these constants instead of
 # re-deriving paths from __file__ or a relative "data" literal.
 SESSIONS_FILE = os.path.join(DATA_DIR, "sessions.json")
 MEMORY_FILE = os.path.join(DATA_DIR, "memory.json")
@@ -110,7 +110,7 @@ DEFAULT_MAX_TOKENS = 0
 
 
 def internal_api_base() -> str:
-    """Base URL for in-process loopback calls to Odysseus's own API.
+    """Base URL for in-process loopback calls to MultiVision's own API.
 
     Agent tools and background jobs reach admin-gated routes by calling the
     running server over HTTP. Resolution order:

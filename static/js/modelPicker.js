@@ -13,8 +13,8 @@ const API_BASE = window.location.origin;
 // Recent is auto-tracked (last 5 picks, most-recent-first) and lives in its
 // own key. Favorites is the SAME key the sidebar Models section uses, so a
 // favorite toggled here shows up there and vice-versa.
-const RECENT_KEY = 'odysseus-model-recent';
-const FAVORITES_KEY = 'odysseus-model-favorites';
+const RECENT_KEY = 'multivision-model-recent';
+const FAVORITES_KEY = 'multivision-model-favorites';
 const RECENT_MAX = 5;
 // Catalogs at or below this size are small enough that hiding everything
 // behind search would be a regression — keep listing them in browse mode.
@@ -148,7 +148,7 @@ async function _ensureDefaultPendingChat() {
       if (latest && latest.modelId && latest.source !== 'default' && latest.source !== 'fallback') return;
       try {
         window.__odysseusDefaultChat = dc;
-        localStorage.setItem('odysseus-default-chat-cache', JSON.stringify(dc));
+        localStorage.setItem('multivision-default-chat-cache', JSON.stringify(dc));
       } catch (_) {}
       const pendingUrl = String((latest && latest.url) || '').replace(/\/+$/, '');
       const defaultUrl = String(dc.endpoint_url || '').replace(/\/+$/, '');
@@ -424,7 +424,7 @@ function _initModelPickerDropdown() {
     let slug = slash > 0 ? mid.substring(0, slash) : 'other';
     return _PROVIDER_ALIAS[slug] || slug;
   }
-  const _collapsedProviders = new Set(_loadList('odysseus-model-collapsed'));
+  const _collapsedProviders = new Set(_loadList('multivision-model-collapsed'));
   let _justExpandedProvider = null;
 
   function _populate(filter) {
@@ -620,7 +620,7 @@ function _initModelPickerDropdown() {
             _collapsedProviders.add(provider);
             _justExpandedProvider = null;
           }
-          _saveList('odysseus-model-collapsed', [..._collapsedProviders]);
+          _saveList('multivision-model-collapsed', [..._collapsedProviders]);
           const st = listEl.scrollTop;
           _populate('');
           listEl.scrollTop = st;
@@ -889,7 +889,7 @@ export function updateModelPicker() {
     } catch (_) {}
     if (!cachedDefault || !cachedDefault.endpoint_url || !cachedDefault.model) {
       try {
-        cachedDefault = JSON.parse(localStorage.getItem('odysseus-default-chat-cache') || 'null');
+        cachedDefault = JSON.parse(localStorage.getItem('multivision-default-chat-cache') || 'null');
       } catch (_) {}
     }
     if (cachedDefault && cachedDefault.endpoint_url && cachedDefault.model) {
@@ -902,7 +902,7 @@ export function updateModelPicker() {
       });
     }
   }
-  // SECURITY: deliberately NOT auto-injecting `odysseus-model-favorites[0]`
+  // SECURITY: deliberately NOT auto-injecting `multivision-model-favorites[0]`
   // here. localStorage favorites are per-browser, not per-user, so on a
   // shared browser the previous account's first favorited model would
   // silently pre-populate the chatbox of the next user that signed in. If

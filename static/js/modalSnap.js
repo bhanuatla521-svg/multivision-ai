@@ -20,8 +20,8 @@
 const SNAP_PX = 60;
 const UNSNAP_PX = 80;
 const MIN_CHAT_WIDTH = 380;
-const EMAIL_DOC_SPLIT_WIDTH_KEY = 'odysseus-email-doc-split-width';
-const EDGE_DOCK_WIDTH_KEY_PREFIX = 'odysseus-edge-dock-width';
+const EMAIL_DOC_SPLIT_WIDTH_KEY = 'multivision-email-doc-split-width';
+const EDGE_DOCK_WIDTH_KEY_PREFIX = 'multivision-edge-dock-width';
 const MIN_EDGE_DOCK_WIDTH = 320;
 
 let _edgeDockHandlePositioner = null;

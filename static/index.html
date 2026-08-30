@@ -12,14 +12,14 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <!-- Disable iOS / Android auto-linkifying of numbers (phone/date/address)
        in email bodies — was wrapping random digits in <a href="tel:..."> with
-       browser-default styling that didn't match the Odysseus theme. -->
+       browser-default styling that didn't match the MultiVision theme. -->
   <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
   <link rel="apple-touch-icon" href="/static/icons/icon-192.png">
   <script nonce="{{CSP_NONCE}}">
   window._odysseusLoadTime = Date.now();
   (function(){
     try {
-      var t = JSON.parse(localStorage.getItem('odysseus-theme'));
+      var t = JSON.parse(localStorage.getItem('multivision-theme'));
       if (t && t.colors) {
         var s = document.documentElement.style;
         var c = t.colors;
@@ -89,7 +89,7 @@
       // Apply UI text-size scale early (global accessibility pref, independent
       // of the active theme) so there's no flash on load.
       try {
-        var _us = localStorage.getItem('odysseus-ui-scale');
+        var _us = localStorage.getItem('multivision-ui-scale');
         if (_us && _us !== '100') document.documentElement.classList.add('ui-scale-' + _us);
       } catch(e){}
       // Restore the sidebar mode before first paint. Otherwise the icon rail
@@ -99,7 +99,7 @@
         if (_mobileStartup) {
           document.documentElement.classList.add('ody-sidebar-off', 'ody-mobile-startup-sidebar-hidden');
         } else {
-          var _sm = localStorage.getItem('odysseus-sidebar-mode') || 'full';
+          var _sm = localStorage.getItem('multivision-sidebar-mode') || 'full';
           if (_sm === 'mini') document.documentElement.classList.add('ody-sidebar-mini');
           else if (_sm === 'off') document.documentElement.classList.add('ody-sidebar-off');
         }
@@ -120,7 +120,7 @@
   (function(){
     try {
       var path = (window.location.pathname || '').toLowerCase();
-      var theme = (function(){ try { return JSON.parse(localStorage.getItem('odysseus-theme')); } catch(_) { return null; } })();
+      var theme = (function(){ try { return JSON.parse(localStorage.getItem('multivision-theme')); } catch(_) { return null; } })();
       var ac = (theme && (theme.red || theme.colors && theme.colors.red)) || '#e06c75';
       // Shapes are line-stroke SVGs (no emoji glyphs). Each entry returns
       // the inner SVG markup rendered against currentColor=`ac`.
@@ -1065,14 +1065,14 @@
             return true;
           }
           try {
-            var dc = JSON.parse(localStorage.getItem('odysseus-default-chat-cache') || 'null');
+            var dc = JSON.parse(localStorage.getItem('multivision-default-chat-cache') || 'null');
             if (applyDefault(dc)) return;
           } catch (_) {}
           fetch('/api/default-chat', { credentials: 'same-origin' })
             .then(function(r){ return r.ok ? r.json() : null; })
             .then(function(dc){
               if (!applyDefault(dc)) return;
-              try { localStorage.setItem('odysseus-default-chat-cache', JSON.stringify(dc)); } catch (_) {}
+              try { localStorage.setItem('multivision-default-chat-cache', JSON.stringify(dc)); } catch (_) {}
             })
             .catch(function(){});
         })();
@@ -2097,7 +2097,7 @@
           </div>
           <div class="admin-card">
             <h2><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px;opacity:0.6"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Public App URL</h2>
-            <div class="admin-toggle-sub" style="margin-bottom:8px">Used to build clickable links back to Odysseus inside outgoing reminder / urgent-email emails (e.g. <code>https://chat.yourdomain.com</code>). Leave blank to omit links.</div>
+            <div class="admin-toggle-sub" style="margin-bottom:8px">Used to build clickable links back to MultiVision inside outgoing reminder / urgent-email emails (e.g. <code>https://chat.yourdomain.com</code>). Leave blank to omit links.</div>
             <div class="settings-col">
               <div class="settings-row">
                 <label class="settings-label">URL</label>
@@ -2355,7 +2355,7 @@
               </svg>
               Terminal Logs
             </h2>
-            <div class="admin-toggle-sub settings-system-logs-toggle-sub">Live diagnostic logs and system output from the Odysseus process.</div>
+            <div class="admin-toggle-sub settings-system-logs-toggle-sub">Live diagnostic logs and system output from the MultiVision process.</div>
 
             <div class="settings-col settings-system-logs-col">
               <!-- Controls row -->

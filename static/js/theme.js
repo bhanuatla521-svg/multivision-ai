@@ -43,8 +43,8 @@ export const THEMES = {
 };
 
 const DEFAULT_THEME = 'claude';
-const LS_KEY = 'odysseus-theme';
-const CUSTOM_THEMES_KEY = 'odysseus-custom-themes';
+const LS_KEY = 'multivision-theme';
+const CUSTOM_THEMES_KEY = 'multivision-custom-themes';
 
 const FONT_MAP = {
   sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif",
@@ -402,7 +402,7 @@ export function applyFontDensity(font, density) {
 // UI text-size scale (accessibility). Global and independent of the active
 // theme, so the chosen size persists across theme switches. Stored as a plain
 // percentage string ('100' | '110' | '125' | '150').
-const UI_SCALE_KEY = 'odysseus-ui-scale';
+const UI_SCALE_KEY = 'multivision-ui-scale';
 const DEFAULT_UI_SCALE = '100';
 
 export function applyUiScale(scale) {

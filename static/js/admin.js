@@ -2533,7 +2533,7 @@ async function loadTokens() {
         // Codex / Claude integration cards on the Integrations panel are
         // backed by these tokens — let them re-render so the deleted token
         // disappears there too.
-        try { window.dispatchEvent(new CustomEvent('odysseus-integrations-changed')); } catch (_) {}
+        try { window.dispatchEvent(new CustomEvent('multivision-integrations-changed')); } catch (_) {}
       });
     });
     // Toggle permissions panel
