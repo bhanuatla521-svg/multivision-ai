@@ -1,0 +1,1567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MultiVision AI — Model Intelligence & Operations Control Center</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' fill='none'%3E%3Ccircle cx='16' cy='16' r='14' fill='%231f1d1a'/%3E%3Cpath d='M16 7L18.2 13.8L25 16L18.2 18.2L16 25L13.8 18.2L7 16L13.8 13.8Z' fill='%23d97757'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Claude's Signature Warm Dark Palette */
+      --bg-base: #181614;
+      --bg-surface: #201d1a;
+      --bg-card: #282421;
+      --bg-card-hover: #302b27;
+      --bg-input: #1c1917;
+      --border: rgba(237, 232, 227, 0.09);
+      --border-focus: rgba(217, 119, 87, 0.45);
+      
+      /* Claude Terracotta & Warm Tones */
+      --claude-terracotta: #d97757;
+      --claude-terracotta-hover: #e08465;
+      --claude-terracotta-light: rgba(217, 119, 87, 0.12);
+      --claude-sand: #ede8e3;
+      --claude-sand-muted: #b8b0a6;
+      --claude-sand-dim: #7d756d;
+      
+      /* Accents */
+      --success: #4ade80;
+      --success-bg: rgba(74, 222, 128, 0.1);
+      --warning: #fbbf24;
+      --warning-bg: rgba(251, 191, 36, 0.1);
+      --danger: #f87171;
+      --danger-bg: rgba(248, 113, 113, 0.1);
+      --info: #60a5fa;
+      --info-bg: rgba(96, 165, 250, 0.1);
+
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-sm: 6px;
+      --radius-pill: 9999px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--claude-sand);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+      background-image: 
+        radial-gradient(circle at 15% 10%, rgba(217, 119, 87, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(184, 176, 166, 0.03) 0%, transparent 40%);
+      background-attachment: fixed;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Claude Minimalist Top Navigation Header */
+    header {
+      padding: 1rem 2rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      backdrop-filter: blur(12px);
+      background: rgba(24, 22, 20, 0.92);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: var(--claude-sand);
+    }
+
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: var(--claude-terracotta);
+      display: grid;
+      place-items: center;
+      font-size: 1.2rem;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(217, 119, 87, 0.3);
+    }
+
+    .brand-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--claude-sand);
+    }
+
+    .badge-live {
+      font-size: 0.72rem;
+      padding: 0.2rem 0.55rem;
+      background: var(--claude-terracotta-light);
+      border: 1px solid rgba(217, 119, 87, 0.3);
+      color: var(--claude-terracotta);
+      border-radius: var(--radius-pill);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .free-mode-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      padding: 0.35rem 0.8rem;
+      border-radius: var(--radius-pill);
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--claude-sand-muted);
+      transition: all 0.2s ease;
+    }
+
+    .free-mode-toggle.active {
+      background: rgba(74, 222, 128, 0.1);
+      border-color: rgba(74, 222, 128, 0.3);
+      color: var(--success);
+    }
+
+    .nav-btn {
+      padding: 0.45rem 0.9rem;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      color: var(--claude-sand-muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--claude-sand);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    /* Claude Warm Nav Tabs */
+    .tab-bar {
+      display: flex;
+      gap: 0.25rem;
+      padding: 0.75rem 2rem 0;
+      border-bottom: 1px solid var(--border);
+      background: rgba(32, 29, 26, 0.6);
+      overflow-x: auto;
+    }
+
+    .tab-link {
+      padding: 0.7rem 1.1rem;
+      border: none;
+      background: transparent;
+      color: var(--claude-sand-muted);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      font-family: inherit;
+    }
+
+    .tab-link:hover { color: var(--claude-sand); }
+    .tab-link.active {
+      color: var(--claude-sand);
+      font-weight: 600;
+      border-bottom-color: var(--claude-terracotta);
+    }
+
+    main {
+      flex: 1;
+      max-width: 1350px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.25s ease-out; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Claude Stats Overview Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.35rem 1.5rem;
+      transition: all 0.2s ease;
+    }
+    .stat-card:hover { border-color: rgba(217, 119, 87, 0.3); background: var(--bg-card); }
+
+    .stat-title {
+      font-size: 0.78rem;
+      color: var(--claude-sand-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.4rem;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.9rem;
+      font-weight: 600;
+      color: var(--claude-sand);
+    }
+    .stat-sub { font-size: 0.78rem; color: var(--claude-sand-dim); margin-top: 0.25rem; }
+
+    /* Main Container Cards */
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.75rem;
+      margin-bottom: 2rem;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .card-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.3rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--claude-sand);
+    }
+
+    /* Claude Filter Chips */
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .filter-chip {
+      padding: 0.35rem 0.8rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      font-size: 0.8rem;
+      color: var(--claude-sand-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+    .filter-chip:hover {
+      border-color: rgba(217, 119, 87, 0.4);
+      color: var(--claude-sand);
+      background: rgba(217, 119, 87, 0.06);
+    }
+    .filter-chip.active {
+      background: var(--claude-terracotta-light);
+      border-color: var(--claude-terracotta);
+      color: var(--claude-sand);
+      font-weight: 600;
+    }
+
+    /* Claude Clean Minimalist Tables */
+    .data-table-wrapper { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--claude-sand-dim);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+    td {
+      padding: 0.95rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      font-size: 0.88rem;
+      color: var(--claude-sand);
+    }
+    tr:hover td { background: rgba(255, 255, 255, 0.02); }
+
+    .score-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.2rem 0.55rem;
+      border-radius: var(--radius-pill);
+      font-weight: 600;
+      font-size: 0.8rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .score-high { background: var(--success-bg); color: var(--success); border: 1px solid rgba(74, 222, 128, 0.25); }
+    .score-med { background: var(--warning-bg); color: var(--warning); border: 1px solid rgba(251, 191, 36, 0.25); }
+
+    .cost-tag {
+      font-size: 0.74rem;
+      padding: 0.18rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .cost-free { background: var(--success-bg); color: var(--success); border: 1px solid rgba(74, 222, 128, 0.25); }
+    .cost-paid { background: var(--danger-bg); color: var(--danger); border: 1px solid rgba(248, 113, 113, 0.25); }
+    .cost-local { background: var(--info-bg); color: var(--info); border: 1px solid rgba(96, 165, 250, 0.25); }
+
+    .cap-pill {
+      display: inline-block;
+      font-size: 0.7rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      color: var(--claude-sand-muted);
+      margin: 0.1rem;
+    }
+    .cap-pill.active {
+      background: var(--claude-terracotta-light);
+      border-color: rgba(217, 119, 87, 0.35);
+      color: #e59a80;
+    }
+
+    /* Task Cards Grid */
+    .task-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .task-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.35rem;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .task-card:hover { transform: translateY(-2px); border-color: rgba(217, 119, 87, 0.4); background: var(--bg-card); }
+
+    .task-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+    .task-name { font-weight: 600; font-size: 1rem; font-family: 'Lora', Georgia, serif; color: var(--claude-sand); }
+    .task-model { font-size: 1.1rem; font-weight: 700; color: var(--claude-terracotta); margin-bottom: 0.4rem; }
+    .task-reason { font-size: 0.84rem; color: var(--claude-sand-muted); line-height: 1.45; margin-bottom: 1rem; flex: 1; }
+    .task-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 0.75rem; font-size: 0.78rem; color: var(--claude-sand-dim); }
+
+    /* Claude Prompt & Router Lab Box */
+    .lab-input-box {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      color: var(--claude-sand);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      min-height: 110px;
+      margin-bottom: 1rem;
+      outline: none;
+      transition: border-color 0.2s ease;
+      font-family: inherit;
+    }
+    .lab-input-box:focus { border-color: var(--claude-terracotta); box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.15); }
+
+    .btn-action {
+      padding: 0.65rem 1.35rem;
+      background: var(--claude-terracotta);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      box-shadow: 0 2px 8px rgba(217, 119, 87, 0.25);
+      transition: all 0.2s ease;
+      font-family: inherit;
+      text-decoration: none;
+    }
+    .btn-action:hover {
+      background: var(--claude-terracotta-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(217, 119, 87, 0.35);
+    }
+
+    .plan-box {
+      margin-top: 1.5rem;
+      padding: 1.35rem;
+      background: var(--bg-input);
+      border: 1px solid rgba(217, 119, 87, 0.35);
+      border-radius: var(--radius-md);
+      display: none;
+    }
+    .plan-box.active { display: block; animation: fadeIn 0.25s ease-out; }
+
+    /* Chart section */
+    .chart-section {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      animation: fadeIn 0.3s ease;
+    }
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+    .btn-toggle-chart {
+      padding: 0.4rem 0.9rem;
+      background: rgba(217,119,87,0.12);
+      border: 1px solid rgba(217,119,87,0.35);
+      border-radius: var(--radius-pill);
+      color: var(--claude-terracotta);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .btn-toggle-chart:hover { background: rgba(217,119,87,0.2); }
+    .chart-canvas-wrap { position: relative; height: 260px; }
+
+    /* Settings Modal */
+    .settings-btn {
+      width: 34px; height: 34px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--claude-sand-muted);
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: grid; place-items: center;
+      transition: all 0.2s ease;
+    }
+    .settings-btn:hover { background: rgba(255,255,255,0.08); color: var(--claude-sand); }
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      width: 480px;
+      max-width: 96vw;
+      animation: fadeIn 0.2s ease;
+    }
+    .modal-title {
+      font-family: 'Lora', Georgia, serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: var(--claude-sand);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .setting-row {
+      margin-bottom: 1.25rem;
+    }
+    .setting-label {
+      font-size: 0.82rem;
+      color: var(--claude-sand-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .setting-select {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.6rem 0.85rem;
+      color: var(--claude-sand);
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .setting-select:focus { border-color: var(--claude-terracotta); }
+    .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.75rem; }
+    .btn-secondary {
+      padding: 0.55rem 1.1rem;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--claude-sand-muted);
+      font-family: inherit; font-size: 0.88rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s ease;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+
+    /* Health Analyzer */
+    .health-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .health-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+    .health-card.ok { border-color: rgba(74,222,128,0.3); }
+    .health-card.warn { border-color: rgba(251,191,36,0.3); }
+    .health-card.err { border-color: rgba(248,113,113,0.3); }
+    .health-card.checking { border-color: rgba(96,165,250,0.3); }
+    .health-name { font-weight: 700; font-size: 1rem; color: var(--claude-sand); margin-bottom: 0.4rem; }
+    .health-status { font-size: 0.78rem; font-weight: 600; padding: 0.2rem 0.55rem; border-radius: var(--radius-pill); display: inline-block; margin-bottom: 0.55rem; }
+    .health-status.ok { background: var(--success-bg); color: var(--success); }
+    .health-status.warn { background: var(--warning-bg); color: var(--warning); }
+    .health-status.err { background: var(--danger-bg); color: var(--danger); }
+    .health-status.checking { background: var(--info-bg); color: var(--info); }
+    .health-detail { font-size: 0.8rem; color: var(--claude-sand-dim); line-height: 1.5; }
+    .health-latency { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--claude-terracotta); margin-top: 0.35rem; }
+    .health-log {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      line-height: 1.65;
+      color: var(--claude-sand-muted);
+      max-height: 320px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+    .log-ok { color: var(--success); }
+    .log-warn { color: var(--warning); }
+    .log-err { color: var(--danger); }
+    .log-info { color: var(--info); }
+    .spinner {
+      display: inline-block;
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.15);
+      border-top-color: var(--claude-terracotta);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    footer {
+      padding: 2rem;
+      text-align: center;
+      color: var(--claude-sand-dim);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="/" class="brand">
+      <div class="brand-icon">✦</div>
+      <div class="brand-title">MultiVision AI</div>
+      <span class="badge-live">● Control Center</span>
+    </a>
+    <div class="header-actions">
+      <div class="free-mode-toggle active" id="freeModeBtn" onclick="toggleFreeMode()">
+        <span>🛡️</span> Free-First Mode: <strong id="freeModeLabel">ON</strong>
+      </div>
+      <a href="http://127.0.0.1:7000/" class="nav-btn">💬 Chat Workspace</a>
+      <button class="settings-btn" onclick="openSettings()" title="Settings">⚙️</button>
+    </div>
+  </header>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settingsModal" onclick="closeSettingsOutside(event)">
+    <div class="modal-box">
+      <div class="modal-title">⚙️ Settings</div>
+
+      <div class="setting-row">
+        <div class="setting-label">Default Page on Startup</div>
+        <select class="setting-select" id="defaultPageSelect">
+          <option value="/ai-models">🧠 AI Control Center (Model Intelligence)</option>
+          <option value="/">💬 Chat Workspace</option>
+          <option value="/ai-operations">⚡ Operations Inspector</option>
+          <option value="/ai-cost">💰 Cost Analytics</option>
+          <option value="/multivision">🔮 Multimodal Routing Lab</option>
+        </select>
+        <p style="font-size:0.78rem; color: var(--claude-sand-dim); margin-top:0.5rem;">When this page is loaded with no hash, redirect to the selected page automatically.</p>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-label">Chart Display</div>
+        <select class="setting-select" id="defaultChartSelect">
+          <option value="show">📊 Show chart on Model Intelligence tab</option>
+          <option value="hide">🚫 Hide chart by default</option>
+        </select>
+      </div>
+
+      <div class="setting-row">
+        <div class="setting-label">Free-First Mode Default</div>
+        <select class="setting-select" id="defaultFreeModeSelect">
+          <option value="on">✅ ON — Block paid models</option>
+          <option value="off">❌ OFF — Allow all models</option>
+        </select>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeSettings()">Cancel</button>
+        <button class="btn-action" onclick="saveSettings()">💾 Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Claude Warm Navigation Tabs -->
+  <div class="tab-bar">
+    <button class="tab-link active" onclick="switchTab(this, 'catalog')">🧠 Model Intelligence</button>
+    <button class="tab-link" onclick="switchTab(this, 'best-task')">🏆 Best by Task</button>
+    <button class="tab-link" onclick="switchTab(this, 'comparison')">⚖️ Comparison</button>
+    <button class="tab-link" onclick="switchTab(this, 'operations')">⚡ Operations & Inspector</button>
+    <button class="tab-link" onclick="switchTab(this, 'cost')">💰 Cost Analytics</button>
+    <button class="tab-link" onclick="switchTab(this, 'lab')">🔮 Multimodal Lab</button>
+    <button class="tab-link" onclick="switchTab(this, 'health')">🩺 Health Analyzer</button>
+    <button class="tab-link" onclick="switchTab(this, 'reports')">📄 Export Reports</button>
+  </div>
+
+  <main>
+    <!-- TAB 1: MODEL CATALOG -->
+    <section id="tab-catalog" class="tab-content active">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-title">Cataloged Models</div>
+          <div class="stat-value" id="statTotalModels">16</div>
+          <div class="stat-sub">Across Google, OpenRouter, Groq & Ollama</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Free-Tier Verified</div>
+          <div class="stat-value" style="color: var(--success);" id="statFreeModels">14</div>
+          <div class="stat-sub">100% Free / Free-Tier APIs</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Paid Models</div>
+          <div class="stat-value" style="color: var(--danger);" id="statPaidModels">2</div>
+          <div class="stat-sub">Gated by FREE_ONLY policy</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Active Gateways</div>
+          <div class="stat-value" style="color: var(--claude-terracotta);" id="statProviders">4 Online</div>
+          <div class="stat-sub">Google, OpenRouter, Groq, Ollama</div>
+        </div>
+      </div>
+
+      <!-- Chart section with toggle -->
+      <div class="chart-section" id="chartSection">
+        <div class="chart-header">
+          <div class="card-title">📊 Model Distribution Chart</div>
+          <button class="btn-toggle-chart" id="chartToggleBtn" onclick="toggleChart()">🙈 Hide Chart</button>
+        </div>
+        <div class="chart-canvas-wrap" id="chartCanvasWrap">
+          <canvas id="modelChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🔍 Searchable Model Intelligence Catalog</div>
+          <input type="text" id="modelSearchInput" placeholder="Filter models by name, provider, keyword..." onkeyup="filterModels()" style="padding: 0.5rem 0.9rem; background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--claude-sand); outline: none; width: 280px; font-family: inherit; font-size: 0.85rem;">
+        </div>
+
+        <div class="filter-row">
+          <div class="filter-chip active" onclick="toggleFilter(this, 'all')">All Models</div>
+          <div class="filter-chip" onclick="toggleFilter(this, 'free')">Free Only</div>
+          <div class="filter-chip" onclick="toggleFilter(this, 'vision')">Vision (Images)</div>
+          <div class="filter-chip" onclick="toggleFilter(this, 'audio')">Audio</div>
+          <div class="filter-chip" onclick="toggleFilter(this, 'video')">Video</div>
+          <div class="filter-chip" onclick="toggleFilter(this, 'pdf')">PDF / Documents</div>
+          <div class="filter-chip" onclick="toggleFilter(this, 'coding')">Coding</div>
+          <div class="filter-chip" onclick="toggleFilter(this, 'reasoning')">Deep Reasoning</div>
+        </div>
+
+        <div class="data-table-wrapper">
+          <table id="modelsTable">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Provider</th>
+                <th>Pricing Tier</th>
+                <th>Input Cost</th>
+                <th>Context</th>
+                <th>Capabilities</th>
+                <th>Quality</th>
+                <th>Speed</th>
+              </tr>
+            </thead>
+            <tbody id="modelsTableBody">
+              <tr><td colspan="8" style="text-align: center; color: var(--claude-sand-dim);">Loading models...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: BEST MODEL FOR EVERY TASK -->
+    <section id="tab-best-task" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏆 Optimal Model Recommendations by Task</div>
+          <span style="font-size: 0.82rem; color: var(--claude-sand-dim);">Dynamically scored (0–100) on Capability Match, Quality, Speed & Zero Cost</span>
+        </div>
+        <div class="task-cards-grid" id="taskCardsGrid">
+          <!-- Loaded dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: MODEL COMPARISON -->
+    <section id="tab-comparison" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">⚖️ Side-by-Side Model Comparison</div>
+          <button class="btn-action" onclick="runComparison()">Compare Selected</button>
+        </div>
+        <p style="color: var(--claude-sand-muted); font-size: 0.88rem; margin-bottom: 1.25rem;">Compare latency, quality, pricing, context window, and modality support side-by-side.</p>
+        <div id="compareCheckboxes" style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;"></div>
+        <div class="data-table-wrapper">
+          <table id="compareTable">
+            <tbody id="compareTableBody">
+              <tr><td style="text-align: center; color: var(--claude-sand-dim);">Select models above and click Compare.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: OPERATIONS & LIVE INSPECTOR -->
+    <section id="tab-operations" class="tab-content">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-title">Processed Requests</div>
+          <div class="stat-value" id="opsTotalReqs">0</div>
+          <div class="stat-sub" id="opsFreeRatio">100% Free Tier</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Avg Latency</div>
+          <div class="stat-value" style="color: var(--claude-terracotta);" id="opsAvgLatency">0 ms</div>
+          <div class="stat-sub">End-to-end engine latency</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Fallback Resolved</div>
+          <div class="stat-value" style="color: var(--success);" id="opsFallbackReqs">0</div>
+          <div class="stat-sub">503/429 Resilient Failovers</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-title">Total Cost</div>
+          <div class="stat-value" style="color: var(--success);" id="opsTotalCost">$0.0000</div>
+          <div class="stat-sub">Free-First Enforcement Active</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📡 Provider Gateway Health & Key Status</div>
+          <button class="nav-btn" onclick="loadProviders()">↻ Refresh</button>
+        </div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Provider</th>
+                <th>API Key Status</th>
+                <th>Masked Key</th>
+                <th>Gateway Status</th>
+                <th>Available Models</th>
+                <th>Requests Today</th>
+                <th>Errors</th>
+              </tr>
+            </thead>
+            <tbody id="providersTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🔬 Per-Request AI Transparency Inspector</div>
+          <span style="font-size: 0.82rem; color: var(--claude-sand-dim);">Real-time log of prompt routing decisions, modalities, fallback events, and costs</span>
+        </div>
+        <div class="data-table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Task</th>
+                <th>Modalities</th>
+                <th>Selected Model</th>
+                <th>Routing Reason</th>
+                <th>Status</th>
+                <th>Latency</th>
+                <th>Cost</th>
+              </tr>
+            </thead>
+            <tbody id="requestsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: COST CONTROL -->
+    <section id="tab-cost" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">💰 Cost Control & Usage Analytics</div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-title">Free vs Paid Ratio</div>
+            <div class="stat-value" style="color: var(--success);" id="costFreeRatio">100% Free</div>
+            <div class="stat-sub">Zero unbudgeted API spend</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-title">Total Incurred Cost</div>
+            <div class="stat-value" style="color: var(--success);">$0.0000</div>
+            <div class="stat-sub">FREE_ONLY policy enforced</div>
+          </div>
+        </div>
+        <div style="background: var(--bg-input); border: 1px solid var(--border); padding: 1.35rem; border-radius: var(--radius-md);">
+          <h4 style="margin-bottom: 0.4rem; color: var(--claude-terracotta); font-family: 'Lora', serif;">🛡️ Free-First Cost Protection Policy</h4>
+          <p style="color: var(--claude-sand-muted); font-size: 0.88rem; line-height: 1.5;">
+            When <strong>Free-First Mode</strong> is active, requests to paid models are intercepted and blocked before network dispatch. Automatic failovers are restricted to verified zero-cost endpoints (Google Gemini Free Tiers, OpenRouter <code>:free</code> models, and local Ollama instances).
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 6: MULTIMODAL ROUTER LAB -->
+    <section id="tab-lab" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🔮 Multimodal Routing & Planning Lab</div>
+        </div>
+        <p style="color: var(--claude-sand-muted); font-size: 0.88rem; margin-bottom: 1.25rem;">
+          Test how MultiVision analyzes multi-input prompts (Image + PDF + Video + Audio + Text) and routes the request to a single multimodal model without split-call latency.
+        </p>
+
+        <label style="display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.85rem;">User Request / Prompt:</label>
+        <textarea id="labPrompt" class="lab-input-box" placeholder="Analyze the attached chart.png, contract.pdf, and customer_call.mp3 to explain the system issue..."></textarea>
+
+        <label style="display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.85rem;">Simulate Attached File Names (comma-separated):</label>
+        <input type="text" id="labFiles" value="diagram.png, contract.pdf, meeting_recording.mp4" style="width: 100%; background: var(--bg-input); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.65rem 0.85rem; color: var(--claude-sand); margin-bottom: 1.25rem; outline: none; font-family: inherit; font-size: 0.88rem;">
+
+        <button class="btn-action" onclick="runLabAnalysis()">⚡ Evaluate Multimodal Route</button>
+
+        <div id="labPlanBox" class="plan-box">
+          <h3 style="font-family: 'Lora', serif; margin-bottom: 0.75rem; color: var(--claude-terracotta);">📋 Unified Routing Decision</h3>
+          <div id="labPlanContent" style="font-size: 0.9rem; line-height: 1.6; color: var(--claude-sand);"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 7: HEALTH ANALYZER -->
+    <section id="tab-health" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🩺 Full System Health Analyzer</div>
+          <button class="btn-action" id="runHealthBtn" onclick="runHealthAnalysis()">▶ Run Analysis</button>
+        </div>
+        <p style="color: var(--claude-sand-muted); font-size: 0.88rem; margin-bottom: 1.5rem;">
+          Tests all backend systems, API endpoints, and provider gateway connectivity using your configured API keys. Results are live — no caching.
+        </p>
+        <div class="health-grid" id="healthGrid">
+          <div style="color: var(--claude-sand-dim); font-size: 0.88rem;">Click <strong>Run Analysis</strong> to start a full diagnostic check.</div>
+        </div>
+        <div class="card-title" style="font-size:1rem; margin-bottom: 0.75rem; margin-top: 0.5rem;">📋 Diagnostic Log</div>
+        <div class="health-log" id="healthLog">— Ready. Click Run Analysis to begin. —</div>
+      </div>
+    </section>
+
+    <!-- TAB 8: EXPORT REPORTS -->
+    <section id="tab-reports" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">📄 Generate Comprehensive AI Usage & Health Report</div>
+        </div>
+        <p style="color: var(--claude-sand-muted); font-size: 0.88rem; margin-bottom: 1.25rem;">
+          Export a complete audit covering Provider Health, API Key Status, Model Catalog, Best Model by Task, Actual Usage, Actual Costs, and Quota Warnings.
+        </p>
+        <div style="display: flex; gap: 0.85rem; flex-wrap: wrap;">
+          <a href="/api/multivision/report?format=markdown" target="_blank" class="btn-action">📥 Download Markdown (.md)</a>
+          <a href="/api/multivision/report?format=json" target="_blank" class="btn-action" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border);">📥 Download JSON (.json)</a>
+          <a href="/api/multivision/report?format=csv" target="_blank" class="btn-action" style="background: rgba(255,255,255,0.06); border: 1px solid var(--border);">📥 Download CSV (.csv)</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    MultiVision AI &bull; Model Intelligence & Control Center
+  </footer>
+
+  <script>
+    let allModels = [
+      { model_id: "gemini-2.5-flash", display_name: "Gemini 2.5 Flash", provider: "google", pricing_status: "FREE_TIER", input_price: null, output_price: null, context_window: 1048576, quality_rating: 92, speed_rating: 95, capabilities: { text_input: true, image_input: true, pdf_input: true, audio_input: true, video_input: true, coding: true, reasoning: true, tool_calling: true } },
+      { model_id: "gemini-3.7-flash", display_name: "Gemini 3.7 Flash", provider: "google", pricing_status: "FREE_TIER", input_price: null, output_price: null, context_window: 1048576, quality_rating: 95, speed_rating: 96, capabilities: { text_input: true, image_input: true, pdf_input: true, audio_input: true, video_input: true, coding: true, reasoning: true, tool_calling: true } },
+      { model_id: "gemini-2.5-pro", display_name: "Gemini 2.5 Pro", provider: "google", pricing_status: "FREE_TIER", input_price: null, output_price: null, context_window: 2097152, quality_rating: 97, speed_rating: 80, capabilities: { text_input: true, image_input: true, pdf_input: true, audio_input: true, video_input: true, coding: true, reasoning: true, tool_calling: true } },
+      { model_id: "gemini-3.1-flash-lite", display_name: "Gemini 3.1 Flash Lite", provider: "google", pricing_status: "FREE_TIER", input_price: null, output_price: null, context_window: 1048576, quality_rating: 88, speed_rating: 99, capabilities: { text_input: true, image_input: true, pdf_input: true, audio_input: true, video_input: true, coding: true, reasoning: false, tool_calling: true } },
+      { model_id: "llama-3.3-70b-versatile", display_name: "Llama 3.3 70B Versatile (Groq)", provider: "groq", pricing_status: "FREE_TIER", input_price: null, output_price: null, context_window: 131072, quality_rating: 94, speed_rating: 98, capabilities: { text_input: true, coding: true, reasoning: true, tool_calling: true } },
+      { model_id: "llama-3.1-8b-instant", display_name: "Llama 3.1 8B Instant (Groq)", provider: "groq", pricing_status: "FREE_TIER", input_price: null, output_price: null, context_window: 131072, quality_rating: 85, speed_rating: 99, capabilities: { text_input: true, coding: true, reasoning: false, tool_calling: true } },
+      { model_id: "whisper-large-v3", display_name: "Whisper Large V3 (Groq)", provider: "groq", pricing_status: "FREE_TIER", input_price: null, output_price: null, context_window: 4096, quality_rating: 96, speed_rating: 99, capabilities: { audio_input: true } },
+      { model_id: "meta-llama/llama-3.2-3b-instruct:free", display_name: "Llama 3.2 3B Instruct (Free)", provider: "openrouter", pricing_status: "FREE", input_price: 0.0, output_price: 0.0, context_window: 131072, quality_rating: 82, speed_rating: 92, capabilities: { text_input: true, coding: true } },
+      { model_id: "meta-llama/llama-3.2-11b-vision-instruct:free", display_name: "Llama 3.2 11B Vision (Free)", provider: "openrouter", pricing_status: "FREE", input_price: 0.0, output_price: 0.0, context_window: 131072, quality_rating: 87, speed_rating: 88, capabilities: { text_input: true, image_input: true, coding: true } },
+      { model_id: "qwen/qwen-2.5-coder-32b-instruct:free", display_name: "Qwen 2.5 Coder 32B (Free)", provider: "openrouter", pricing_status: "FREE", input_price: 0.0, output_price: 0.0, context_window: 32768, quality_rating: 93, speed_rating: 86, capabilities: { text_input: true, coding: true, reasoning: true, structured_output: true } },
+      { model_id: "deepseek/deepseek-r1:free", display_name: "DeepSeek R1 (Free)", provider: "openrouter", pricing_status: "FREE", input_price: 0.0, output_price: 0.0, context_window: 65536, quality_rating: 97, speed_rating: 80, capabilities: { text_input: true, reasoning: true, coding: true } },
+      { model_id: "ollama/llama3.2-vision", display_name: "Llama 3.2 Vision (Local)", provider: "ollama", pricing_status: "LOCAL_NO_API_USAGE", input_price: 0.0, output_price: 0.0, context_window: 131072, quality_rating: 84, speed_rating: 85, capabilities: { text_input: true, image_input: true } },
+      { model_id: "ollama/qwen2.5-coder", display_name: "Qwen 2.5 Coder (Local)", provider: "ollama", pricing_status: "LOCAL_NO_API_USAGE", input_price: 0.0, output_price: 0.0, context_window: 32768, quality_rating: 89, speed_rating: 88, capabilities: { text_input: true, coding: true, reasoning: true } },
+      { model_id: "ollama/llama3.2", display_name: "Llama 3.2 (Local)", provider: "ollama", pricing_status: "LOCAL_NO_API_USAGE", input_price: 0.0, output_price: 0.0, context_window: 131072, quality_rating: 83, speed_rating: 90, capabilities: { text_input: true, coding: true } },
+      { model_id: "anthropic/claude-3.5-sonnet", display_name: "Claude 3.5 Sonnet (Paid)", provider: "openrouter", pricing_status: "PAID", input_price: 3.0, output_price: 15.0, context_window: 200000, quality_rating: 99, speed_rating: 82, capabilities: { text_input: true, image_input: true, pdf_input: true, coding: true, reasoning: true, tool_calling: true } },
+      { model_id: "openai/gpt-4o", display_name: "GPT-4o (Paid)", provider: "openrouter", pricing_status: "PAID", input_price: 2.5, output_price: 10.0, context_window: 128000, quality_rating: 97, speed_rating: 85, capabilities: { text_input: true, image_input: true, pdf_input: true, audio_input: true, coding: true, reasoning: true, tool_calling: true } }
+    ];
+    let currentFilter = 'all';
+
+    function switchTab(btn, tabId) {
+      document.querySelectorAll('.tab-link').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      const target = document.getElementById('tab-' + tabId);
+      if (target) target.classList.add('active');
+
+      if (tabId === 'best-task') loadBestByTask();
+      if (tabId === 'operations' || tabId === 'cost') { loadProviders(); loadRecentRequests(); loadMetrics(); }
+    }
+
+    async function loadFreeMode() {
+      try {
+        const r = await fetch('/api/multivision/free-mode');
+        const d = await r.json();
+        updateFreeModeUI(d.free_only);
+      } catch (e) { console.error('Error loading free mode:', e); }
+    }
+
+    async function toggleFreeMode() {
+      const current = document.getElementById('freeModeBtn').classList.contains('active');
+      try {
+        const r = await fetch('/api/multivision/toggle-free-mode', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ enabled: !current })
+        });
+        const d = await r.json();
+        updateFreeModeUI(d.free_only);
+        loadModels();
+      } catch (e) { console.error('Error toggling free mode:', e); }
+    }
+
+    function updateFreeModeUI(enabled) {
+      const btn = document.getElementById('freeModeBtn');
+      const lbl = document.getElementById('freeModeLabel');
+      if (enabled) {
+        btn.classList.add('active');
+        lbl.textContent = 'ON';
+      } else {
+        btn.classList.remove('active');
+        lbl.textContent = 'OFF';
+      }
+    }
+
+    async function loadModels() {
+      try {
+        const r = await fetch('/api/multivision/models');
+        const d = await r.json();
+        allModels = d.models || [];
+        renderModelsTable(allModels);
+        updateModelStats(allModels);
+        renderCompareCheckboxes(allModels);
+      } catch (e) {
+        console.error('Error loading models:', e);
+        document.getElementById('modelsTableBody').innerHTML = '<tr><td colspan="8" style="text-align:center; color: var(--danger);">Failed to load models.</td></tr>';
+      }
+    }
+
+    function updateModelStats(models) {
+      document.getElementById('statTotalModels').textContent = models.length;
+      const freeCount = models.filter(m => m.pricing_status.includes('FREE') || m.pricing_status.includes('LOCAL')).length;
+      document.getElementById('statFreeModels').textContent = freeCount;
+      document.getElementById('statPaidModels').textContent = models.length - freeCount;
+    }
+
+    function renderModelsTable(models) {
+      const tbody = document.getElementById('modelsTableBody');
+      if (!models.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color: var(--claude-sand-dim);">No models matching filter.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = models.map(m => {
+        const caps = m.capabilities || {};
+        const capPills = [
+          caps.image_input ? '<span class="cap-pill active">Vision</span>' : '',
+          caps.audio_input ? '<span class="cap-pill active">Audio</span>' : '',
+          caps.video_input ? '<span class="cap-pill active">Video</span>' : '',
+          caps.pdf_input ? '<span class="cap-pill active">PDF</span>' : '',
+          caps.coding ? '<span class="cap-pill active">Code</span>' : '',
+          caps.reasoning ? '<span class="cap-pill active">Reasoning</span>' : '',
+        ].filter(Boolean).join(' ');
+
+        let costClass = 'cost-paid';
+        if (m.pricing_status.includes('FREE')) costClass = 'cost-free';
+        if (m.pricing_status.includes('LOCAL')) costClass = 'cost-local';
+
+        const inCost = m.input_price !== null ? `$${m.input_price}/M` : 'Free Tier';
+
+        return `
+          <tr>
+            <td>
+              <strong style="color: var(--claude-sand); font-weight: 600;">${m.display_name}</strong>
+              <div style="font-size: 0.74rem; color: var(--claude-sand-dim); font-family: monospace;">${m.model_id}</div>
+            </td>
+            <td><span style="text-transform: capitalize; color: var(--claude-sand-muted);">${m.provider}</span></td>
+            <td><span class="cost-tag ${costClass}">${m.pricing_status}</span></td>
+            <td><span style="font-family: monospace; font-size: 0.82rem;">${inCost}</span></td>
+            <td><span style="font-size: 0.82rem; font-family: monospace;">${(m.context_window/1000).toFixed(0)}k</span></td>
+            <td>${capPills || '<span style="color:var(--claude-sand-dim); font-size:0.75rem;">Text only</span>'}</td>
+            <td><span class="score-badge ${m.quality_rating >= 90 ? 'score-high' : 'score-med'}">${m.quality_rating}</span></td>
+            <td><span class="score-badge ${m.speed_rating >= 90 ? 'score-high' : 'score-med'}">${m.speed_rating}</span></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function toggleFilter(el, filterType) {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      el.classList.add('active');
+      currentFilter = filterType;
+      filterModels();
+    }
+
+    function filterModels() {
+      const q = (document.getElementById('modelSearchInput').value || '').toLowerCase();
+      let filtered = allModels.filter(m => {
+        const matchesQuery = m.display_name.toLowerCase().includes(q) || m.model_id.toLowerCase().includes(q) || m.provider.toLowerCase().includes(q);
+        if (!matchesQuery) return false;
+
+        const caps = m.capabilities || {};
+        if (currentFilter === 'free') return m.pricing_status.includes('FREE') || m.pricing_status.includes('LOCAL');
+        if (currentFilter === 'vision') return caps.image_input;
+        if (currentFilter === 'audio') return caps.audio_input;
+        if (currentFilter === 'video') return caps.video_input;
+        if (currentFilter === 'pdf') return caps.pdf_input || caps.document_input;
+        if (currentFilter === 'coding') return caps.coding;
+        if (currentFilter === 'reasoning') return caps.reasoning;
+        return true;
+      });
+      renderModelsTable(filtered);
+    }
+
+    async function loadBestByTask() {
+      const grid = document.getElementById('taskCardsGrid');
+      grid.innerHTML = '<div style="color: var(--claude-sand-dim);">Loading recommendations...</div>';
+      try {
+        const r = await fetch('/api/multivision/best-by-task');
+        const d = await r.json();
+        const best = d.best_models || {};
+
+        grid.innerHTML = Object.entries(best).map(([taskKey, info]) => {
+          return `
+            <div class="task-card">
+              <div class="task-card-header">
+                <span class="task-name">${taskKey.replace(/_/g, ' ')}</span>
+                <span class="score-badge score-high">${info.score}/100</span>
+              </div>
+              <div class="task-model">${info.display_name}</div>
+              <div class="task-reason">${info.reason}</div>
+              <div class="task-footer">
+                <span>Tier: <strong style="color:var(--success);">${info.cost_class}</strong></span>
+                <span>Fallback: <strong>${info.fallback_model}</strong></span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      } catch (e) { console.error('Error loading best by task:', e); }
+    }
+
+    function renderCompareCheckboxes(models) {
+      const box = document.getElementById('compareCheckboxes');
+      box.innerHTML = models.slice(0, 8).map((m, idx) => `
+        <label style="font-size: 0.82rem; display: flex; align-items: center; gap: 0.4rem; cursor: pointer; color: var(--claude-sand-muted);">
+          <input type="checkbox" name="compareModel" value="${m.model_id}" ${idx < 3 ? 'checked' : ''}>
+          ${m.display_name}
+        </label>
+      `).join('');
+    }
+
+    async function runComparison() {
+      const checked = Array.from(document.querySelectorAll('input[name="compareModel"]:checked')).map(c => c.value);
+      if (checked.length < 2) {
+        alert('Please select at least 2 models to compare.');
+        return;
+      }
+      try {
+        const r = await fetch('/api/multivision/compare', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ models: checked })
+        });
+        const d = await r.json();
+        const matrix = d.comparison || [];
+        
+        const tbody = document.getElementById('compareTableBody');
+        tbody.innerHTML = `
+          <tr>
+            <th>Metric</th>
+            ${matrix.map(m => `<th>${m.display_name}</th>`).join('')}
+          </tr>
+          <tr>
+            <td><strong>Provider</strong></td>
+            ${matrix.map(m => `<td>${m.provider.toUpperCase()}</td>`).join('')}
+          </tr>
+          <tr>
+            <td><strong>Pricing Status</strong></td>
+            ${matrix.map(m => `<td><span class="cost-tag cost-free">${m.pricing_status}</span></td>`).join('')}
+          </tr>
+          <tr>
+            <td><strong>Overall Score</strong></td>
+            ${matrix.map(m => `<td><span class="score-badge score-high">${m.overall_score}/100</span></td>`).join('')}
+          </tr>
+          <tr>
+            <td><strong>Quality Rating</strong></td>
+            ${matrix.map(m => `<td>${m.quality_rating}/100</td>`).join('')}
+          </tr>
+          <tr>
+            <td><strong>Speed Rating</strong></td>
+            ${matrix.map(m => `<td>${m.speed_rating}/100</td>`).join('')}
+          </tr>
+          <tr>
+            <td><strong>Context Window</strong></td>
+            ${matrix.map(m => `<td>${(m.context_window/1000).toFixed(0)}k tokens</td>`).join('')}
+          </tr>
+        `;
+      } catch (e) { console.error('Error running comparison:', e); }
+    }
+
+    async function loadProviders() {
+      try {
+        const r = await fetch('/api/multivision/providers');
+        const d = await r.json();
+        const tbody = document.getElementById('providersTableBody');
+        tbody.innerHTML = (d.providers || []).map(p => `
+          <tr>
+            <td><strong style="color: var(--claude-sand);">${p.display_name}</strong></td>
+            <td><span class="score-badge score-high">${p.key_status}</span></td>
+            <td><code style="font-family: monospace; color: var(--claude-terracotta); font-size: 0.8rem;">${p.masked_key}</code></td>
+            <td><span style="color: var(--success); font-weight: 600;">● ${p.status}</span></td>
+            <td>${p.available_models} (${p.free_models} free)</td>
+            <td>${p.requests_today}</td>
+            <td>${p.errors_today}</td>
+          </tr>
+        `).join('');
+      } catch (e) { console.error('Error loading providers:', e); }
+    }
+
+    async function loadMetrics() {
+      try {
+        const r = await fetch('/api/multivision/operations');
+        const d = await r.json();
+        document.getElementById('opsTotalReqs').textContent = d.total_requests || 0;
+        document.getElementById('opsAvgLatency').textContent = (d.average_latency_ms || 0) + ' ms';
+        document.getElementById('opsFallbackReqs').textContent = d.fallback_requests || 0;
+        document.getElementById('opsTotalCost').textContent = '$' + (d.total_estimated_cost || 0).toFixed(4);
+        
+        const freePct = d.total_requests ? ((d.free_requests / d.total_requests)*100).toFixed(1) : '100';
+        document.getElementById('opsFreeRatio').textContent = `${freePct}% Free Tier`;
+        document.getElementById('costFreeRatio').textContent = `${freePct}% Free Tier`;
+      } catch (e) { console.error('Error loading metrics:', e); }
+    }
+
+    async function loadRecentRequests() {
+      try {
+        const r = await fetch('/api/multivision/requests?limit=25');
+        const d = await r.json();
+        const tbody = document.getElementById('requestsTableBody');
+        tbody.innerHTML = (d.requests || []).map(req => `
+          <tr>
+            <td style="font-size: 0.78rem; color: var(--claude-sand-dim); font-family: monospace;">${new Date(req.timestamp*1000).toLocaleTimeString()}</td>
+            <td><span class="cap-pill active">${req.task}</span></td>
+            <td>${(req.input_modalities || []).join(' + ')}</td>
+            <td><strong>${req.model}</strong></td>
+            <td style="font-size: 0.82rem; color: var(--claude-sand-muted); max-width: 320px;">${req.routing_reason || 'Direct route'}</td>
+            <td><span style="color: ${req.status==='SUCCESS'?'var(--success)':'var(--danger)'}; font-weight:600;">${req.status}</span></td>
+            <td style="font-family: monospace; font-size: 0.8rem;">${req.latency_ms} ms</td>
+            <td><span class="cost-tag cost-free">$${(req.estimated_cost||0).toFixed(4)}</span></td>
+          </tr>
+        `).join('');
+      } catch (e) { console.error('Error loading requests:', e); }
+    }
+
+    async function runLabAnalysis() {
+      const prompt = document.getElementById('labPrompt').value.trim();
+      const filesStr = document.getElementById('labFiles').value.trim();
+      const files = filesStr ? filesStr.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+      if (!prompt) { alert('Please enter a prompt first.'); return; }
+
+      try {
+        const r = await fetch('/api/multivision/analyze', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ prompt, file_names: files })
+        });
+        const plan = await r.json();
+        const planBox = document.getElementById('labPlanBox');
+        const planContent = document.getElementById('labPlanContent');
+
+        planBox.classList.add('active');
+        planContent.innerHTML = `
+          <div style="margin-bottom: 0.65rem;">
+            <strong>🎯 Detected Task:</strong> <span class="cap-pill active">${plan.detected_task}</span>
+          </div>
+          <div style="margin-bottom: 0.65rem;">
+            <strong>🧩 Combined Modalities:</strong> <code>${plan.input_modalities.join(' + ').toUpperCase()}</code>
+          </div>
+          <div style="margin-bottom: 0.65rem;">
+            <strong>🚀 Selected Model:</strong> <strong style="color: var(--claude-terracotta); font-size: 1.05rem;">${plan.selected_model}</strong> (${plan.selected_provider.toUpperCase()})
+          </div>
+          <div style="margin-bottom: 0.65rem;">
+            <strong>⚡ Execution Architecture:</strong> 
+            <span style="color: var(--success); font-weight: 600;">✓ ONE UNIFIED MULTIMODAL REQUEST</span> (Zero split-call latency)
+          </div>
+          <div style="margin-bottom: 0.65rem;">
+            <strong>💡 Routing Rationale:</strong> <em>${plan.routing_reason}</em>
+          </div>
+          <div>
+            <strong>🛡️ Resilient Fallback Chain:</strong> ${plan.fallback_chain.join(' → ')}
+          </div>
+        `;
+      } catch (e) { console.error('Error analyzing route:', e); }
+    }
+
+    // ====== CHART ======
+    let chartInstance = null;
+    let chartVisible = true;
+
+    function renderChart(models) {
+      const canvas = document.getElementById('modelChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      // Resize canvas
+      canvas.width = canvas.parentElement.offsetWidth;
+      canvas.height = 240;
+
+      const providers = {};
+      models.forEach(m => {
+        providers[m.provider] = (providers[m.provider] || 0) + 1;
+      });
+
+      const labels = Object.keys(providers);
+      const values = Object.values(providers);
+      const colors = ['#d97757','#4ade80','#60a5fa','#fbbf24','#e879f9','#34d399'];
+
+      const barW = Math.min(80, (canvas.width - 80) / labels.length - 20);
+      const chartH = canvas.height - 60;
+      const maxVal = Math.max(...values);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Background
+      ctx.fillStyle = 'rgba(24,22,20,0.0)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      const startX = 60;
+      const spacing = (canvas.width - startX - 40) / labels.length;
+
+      labels.forEach((label, i) => {
+        const barH = (values[i] / maxVal) * chartH;
+        const x = startX + i * spacing + spacing / 2 - barW / 2;
+        const y = chartH - barH + 20;
+
+        // Bar
+        const grad = ctx.createLinearGradient(0, y, 0, y + barH);
+        grad.addColorStop(0, colors[i % colors.length]);
+        grad.addColorStop(1, colors[i % colors.length] + '55');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.roundRect(x, y, barW, barH, 6);
+        ctx.fill();
+
+        // Value label
+        ctx.fillStyle = '#ede8e3';
+        ctx.font = 'bold 13px Plus Jakarta Sans, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(values[i], x + barW / 2, y - 6);
+
+        // X label
+        ctx.fillStyle = '#7d756d';
+        ctx.font = '11px Plus Jakarta Sans, sans-serif';
+        ctx.fillText(label.charAt(0).toUpperCase() + label.slice(1), x + barW / 2, chartH + 38);
+      });
+
+      // Y axis labels
+      ctx.fillStyle = '#7d756d';
+      ctx.font = '10px JetBrains Mono, monospace';
+      ctx.textAlign = 'right';
+      for (let i = 0; i <= 4; i++) {
+        const yVal = Math.round((maxVal / 4) * i);
+        const yPos = 20 + chartH - (i / 4) * chartH;
+        ctx.fillText(yVal, startX - 8, yPos + 4);
+        ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+        ctx.beginPath();
+        ctx.moveTo(startX, yPos);
+        ctx.lineTo(canvas.width - 20, yPos);
+        ctx.stroke();
+      }
+
+      // Title
+      ctx.fillStyle = '#b8b0a6';
+      ctx.font = '11px Plus Jakarta Sans, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('Models per Provider', startX, 14);
+    }
+
+    function toggleChart() {
+      chartVisible = !chartVisible;
+      const wrap = document.getElementById('chartCanvasWrap');
+      const btn = document.getElementById('chartToggleBtn');
+      wrap.style.display = chartVisible ? 'block' : 'none';
+      btn.textContent = chartVisible ? '🙈 Hide Chart' : '📊 Show Chart';
+      localStorage.setItem('mv_chart_visible', chartVisible ? 'show' : 'hide');
+      if (chartVisible && allModels.length) renderChart(allModels);
+    }
+
+    // ====== SETTINGS ======
+    function openSettings() {
+      const modal = document.getElementById('settingsModal');
+      // Load current values
+      document.getElementById('defaultPageSelect').value = localStorage.getItem('mv_default_page') || '/ai-models';
+      document.getElementById('defaultChartSelect').value = localStorage.getItem('mv_chart_visible') || 'show';
+      document.getElementById('defaultFreeModeSelect').value = localStorage.getItem('mv_free_mode') || 'on';
+      modal.classList.add('open');
+    }
+
+    function closeSettings() {
+      document.getElementById('settingsModal').classList.remove('open');
+    }
+
+    function closeSettingsOutside(e) {
+      if (e.target === document.getElementById('settingsModal')) closeSettings();
+    }
+
+    function saveSettings() {
+      const page = document.getElementById('defaultPageSelect').value;
+      const chart = document.getElementById('defaultChartSelect').value;
+      const freeMode = document.getElementById('defaultFreeModeSelect').value;
+      localStorage.setItem('mv_default_page', page);
+      localStorage.setItem('mv_chart_visible', chart);
+      localStorage.setItem('mv_free_mode', freeMode);
+      closeSettings();
+      applySettings();
+      // Toast confirmation
+      const toast = document.createElement('div');
+      toast.textContent = '✅ Settings saved!';
+      Object.assign(toast.style, {
+        position:'fixed', bottom:'2rem', right:'2rem', background:'rgba(74,222,128,0.15)',
+        border:'1px solid rgba(74,222,128,0.35)', color:'#4ade80', padding:'0.65rem 1.2rem',
+        borderRadius:'8px', fontSize:'0.88rem', fontWeight:'600', zIndex:'9999',
+        animation:'fadeIn 0.2s ease'
+      });
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2500);
+    }
+
+    function applySettings() {
+      // Apply chart visibility
+      const chartPref = localStorage.getItem('mv_chart_visible') || 'show';
+      chartVisible = chartPref === 'show';
+      const wrap = document.getElementById('chartCanvasWrap');
+      const btn = document.getElementById('chartToggleBtn');
+      if (wrap) wrap.style.display = chartVisible ? 'block' : 'none';
+      if (btn) btn.textContent = chartVisible ? '🙈 Hide Chart' : '📊 Show Chart';
+    }
+
+    // ====== HEALTH ANALYZER ======
+    async function runHealthAnalysis() {
+      const btn = document.getElementById('runHealthBtn');
+      const grid = document.getElementById('healthGrid');
+      const log = document.getElementById('healthLog');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Analyzing...';
+      log.textContent = '';
+
+      const checks = [
+        { id: 'api_models', name: 'Model Catalog API', url: '/api/multivision/models', method: 'GET' },
+        { id: 'api_providers', name: 'Provider Gateway API', url: '/api/multivision/providers', method: 'GET' },
+        { id: 'api_operations', name: 'Operations Inspector API', url: '/api/multivision/operations', method: 'GET' },
+        { id: 'api_best_task', name: 'Best-by-Task Recommender', url: '/api/multivision/best-by-task', method: 'GET' },
+        { id: 'api_report', name: 'Report Generator', url: '/api/multivision/report?format=json', method: 'GET' },
+        { id: 'api_analyze', name: 'Multimodal Router (Lab)', url: '/api/multivision/analyze', method: 'POST', body: { prompt: 'Test health check', file_names: [] } },
+        { id: 'api_free_mode', name: 'Free-Mode Toggle API', url: '/api/multivision/free-mode', method: 'GET' },
+        { id: 'main_chat', name: 'Chat Workspace Root', url: '/', method: 'GET' },
+        { id: 'api_docs', name: 'Swagger / API Docs', url: '/docs', method: 'GET' },
+      ];
+
+      // Render placeholder cards
+      grid.innerHTML = checks.map(c => `
+        <div class="health-card checking" id="hc_${c.id}">
+          <div class="health-name">${c.name}</div>
+          <span class="health-status checking"><span class="spinner"></span> Checking...</span>
+          <div class="health-detail">—</div>
+          <div class="health-latency">— ms</div>
+        </div>
+      `).join('');
+
+      let logText = `[${new Date().toLocaleTimeString()}] Starting full system health check...\n\n`;
+      log.textContent = logText;
+
+      let passed = 0, failed = 0;
+
+      for (const check of checks) {
+        const card = document.getElementById('hc_' + check.id);
+        const t0 = performance.now();
+        try {
+          const opts = { method: check.method };
+          if (check.method === 'POST') {
+            opts.headers = { 'Content-Type': 'application/json' };
+            opts.body = JSON.stringify(check.body || {});
+          }
+          const resp = await fetch(check.url, opts);
+          const latency = Math.round(performance.now() - t0);
+          const ok = resp.ok;
+          let detail = `HTTP ${resp.status} ${resp.statusText}`;
+
+          if (ok) {
+            passed++;
+            card.className = 'health-card ok';
+            card.querySelector('.health-status').className = 'health-status ok';
+            card.querySelector('.health-status').textContent = '✅ OK';
+            card.querySelector('.health-detail').textContent = detail;
+            card.querySelector('.health-latency').textContent = `${latency} ms`;
+            logText += `<span class="log-ok">✓ PASS</span>  ${check.name.padEnd(38)} ${detail}  <span class="log-info">${latency}ms</span>\n`;
+          } else {
+            failed++;
+            card.className = 'health-card err';
+            card.querySelector('.health-status').className = 'health-status err';
+            card.querySelector('.health-status').textContent = '❌ Failed';
+            card.querySelector('.health-detail').textContent = detail;
+            card.querySelector('.health-latency').textContent = `${latency} ms`;
+            logText += `<span class="log-err">✗ FAIL</span>  ${check.name.padEnd(38)} ${detail}  <span class="log-info">${latency}ms</span>\n`;
+          }
+        } catch (err) {
+          failed++;
+          const latency = Math.round(performance.now() - t0);
+          card.className = 'health-card err';
+          card.querySelector('.health-status').className = 'health-status err';
+          card.querySelector('.health-status').textContent = '❌ Error';
+          card.querySelector('.health-detail').textContent = err.message;
+          card.querySelector('.health-latency').textContent = `${latency} ms`;
+          logText += `<span class="log-err">✗ ERR </span>  ${check.name.padEnd(38)} ${err.message}\n`;
+        }
+        log.innerHTML = logText;
+        log.scrollTop = log.scrollHeight;
+        await new Promise(r => setTimeout(r, 80));
+      }
+
+      logText += `\n<span class="log-ok">━━━ Analysis Complete ━━━</span>\n`;
+      logText += `Passed: <span class="log-ok">${passed}</span>  |  Failed: <span class="log-err">${failed}</span>  |  Total: ${checks.length}\n`;
+      log.innerHTML = logText;
+      btn.disabled = false;
+      btn.innerHTML = '▶ Run Again';
+    }
+
+    // ====== INIT ======
+    function init() {
+      loadFreeMode();
+      loadModels().then(() => {
+        applySettings();
+        if (localStorage.getItem('mv_chart_visible') !== 'hide') {
+          renderChart(allModels);
+        }
+      });
+      loadProviders();
+      loadMetrics();
+
+      // Startup page redirect: only redirect if on the exact /ai-models path
+      // and a default different page is configured.
+      // (Settings apply next page load)
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+
+    // Resize chart on window resize
+    window.addEventListener('resize', () => {
+      if (chartVisible && allModels.length) renderChart(allModels);
+    });
+  </script>
+
+  <!-- Startup redirect script: reads user setting and redirects root to preferred page -->
+  <script>
+    (function(){
+      // Only apply on root page '/' — redirect to user's preferred startup page
+      if (window.location.pathname === '/') {
+        const pref = localStorage.getItem('mv_default_page');
+        if (pref && pref !== '/') {
+          window.location.replace(pref);
+        }
+      }
+    })();
+  </script>
+</body>
+</html>
