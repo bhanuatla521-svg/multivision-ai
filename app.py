@@ -51,7 +51,7 @@ import asyncio
 import logging
 import secrets
 from datetime import datetime, timezone
-from typing import Dict
+from typing import Dict, Any, List, Optional
 
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, HTTPException
@@ -263,11 +263,13 @@ if AUTH_ENABLED:
         "/api/auth/features",
         "/api/auth/settings",
         "/api/auth/integrations/presets",
+        "/health",
         "/api/health",
         "/api/version",
         "/login",
+        "/ai-models",
     }
-    AUTH_EXEMPT_PREFIXES = ["/static"]
+    AUTH_EXEMPT_PREFIXES = ["/static", "/api/multivision", "/api/generated-images"]
     # Dynamic paths whose own handler proves identity via a path-embedded
     # secret instead of the session/bearer auth. The route handler at
     # routes/task_routes.py validates the per-task `webhook_token` itself
@@ -507,6 +509,7 @@ app.mount("/static", _RevalidatingStatic(directory=STATIC_DIR), name="static")
 
 # ========= GENERATED IMAGES =========
 @app.get("/api/generated-image/{filename}")
+@app.get("/api/generated-images/{filename}")
 async def serve_generated_image(filename: str, request: Request):
     """Serve generated images from the data directory."""
     img_path = resolve_generated_image_path(filename)
@@ -1248,9 +1251,21 @@ async def get_version():
     from core.constants import APP_VERSION
     return {"version": APP_VERSION}
 
+@app.get("/health")
 @app.get("/api/health")
-async def health_check() -> Dict[str, str]:
-    return {"status": "healthy", "timestamp": datetime.now(timezone.utc).isoformat()}
+async def health_check() -> Dict[str, Any]:
+    from src.multivision.providers.manager import get_provider_manager, is_demo_mode_forced
+    mgr = get_provider_manager()
+    return {
+        "status": "ok",
+        "service": "multivision-api",
+        "product": "MultiVision AI",
+        "tagline": "Multimodal Intelligence, Unified.",
+        "version": "2.0.0",
+        "demo_mode": is_demo_mode_forced() or not mgr.has_any_live_provider(),
+        "configured_providers": mgr.get_configured_providers(),
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
 
 # Client Perf
 

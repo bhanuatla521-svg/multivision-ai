@@ -9,7 +9,7 @@ from src.constants import GENERATED_IMAGES_DIR
 
 GENERATED_IMAGE_DIR = Path(GENERATED_IMAGES_DIR)
 GENERATED_IMAGE_RE = re.compile(
-    r"^(?:video_)?[a-f0-9]{8,64}\.(png|jpg|jpeg|webp|gif|mp4|mov|webm|mkv|m4v)$",
+    r"^(?:video_|img_|demo_img_)?[a-f0-9]{8,64}\.(png|jpg|jpeg|webp|gif|svg|mp4|mov|webm|mkv|m4v)$",
     re.IGNORECASE
 )
 GENERATED_IMAGE_HEADERS = {

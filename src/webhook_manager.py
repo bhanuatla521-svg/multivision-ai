@@ -15,7 +15,7 @@ from urllib.parse import urlparse
 import httpcore
 import httpx
 
-from src.database import SessionLocal, Webhook
+from core.database import SessionLocal, Webhook
 
 logger = logging.getLogger(__name__)
 

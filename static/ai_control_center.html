@@ -1550,18 +1550,5 @@
       if (chartVisible && allModels.length) renderChart(allModels);
     });
   </script>
-
-  <!-- Startup redirect script: reads user setting and redirects root to preferred page -->
-  <script>
-    (function(){
-      // Only apply on root page '/' — redirect to user's preferred startup page
-      if (window.location.pathname === '/') {
-        const pref = localStorage.getItem('mv_default_page');
-        if (pref && pref !== '/') {
-          window.location.replace(pref);
-        }
-      }
-    })();
-  </script>
 </body>
 </html>

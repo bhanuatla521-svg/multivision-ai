@@ -1,6 +1,6 @@
 # MultiVision AI
 
-### Free-First Multimodal AI Control Center
+### Multimodal Intelligence, Unified.
 
 [![Multimodal AI](https://img.shields.io/badge/AI-Multimodal%20(Text%2C%20Image%2C%20PDF%2C%20Audio%2C%20Video)-orange?style=for-the-badge&logo=openai)](https://github.com/bhanuatla521-svg/multivision-ai)
 [![Free-First](https://img.shields.io/badge/Mode-Free--First%20Routing-green?style=for-the-badge&logo=shield)](https://github.com/bhanuatla521-svg/multivision-ai)

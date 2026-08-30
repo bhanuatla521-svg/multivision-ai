@@ -245,3 +245,55 @@ def api_generate_report(format: str = Query("json", pattern="^(json|markdown|csv
         return PlainTextResponse(csv_text, media_type="text/csv")
     else:
         return JSONResponse(data)
+
+
+class MultiVisionChatRequest(BaseModel):
+    prompt: str
+    model: Optional[str] = "gemini-2.5-flash"
+    provider: Optional[str] = None
+    modalities: List[str] = ["text"]
+    attachments: List[Dict[str, Any]] = []
+
+
+@router.post("/chat")
+async def api_multivision_chat(req: MultiVisionChatRequest):
+    """Direct MultiVision chat with automatic Provider/Demo resolution and latency tracking."""
+    from src.multivision.providers.manager import get_provider_manager
+    from src.multivision.providers.base import ProviderRequest, ProviderMessage
+
+    mgr = get_provider_manager()
+    req_msgs = [ProviderMessage(role="user", content=req.prompt)]
+    provider_req = ProviderRequest(
+        model=req.model or "gemini-2.5-flash",
+        messages=req_msgs,
+        modalities=req.modalities,
+        attachments=req.attachments
+    )
+
+    t0 = time.time()
+    resp = await mgr.chat(provider_req, provider_hint=req.provider)
+    elapsed_ms = (time.time() - t0) * 1000.0
+
+    log_ai_usage(
+        provider=resp.provider,
+        model=resp.model,
+        task="CHAT",
+        input_modalities=req.modalities,
+        latency_ms=elapsed_ms,
+        status="SUCCESS",
+        prompt_preview=req.prompt
+    )
+
+    return resp.model_dump()
+
+
+class ImageGenRequest(BaseModel):
+    prompt: str
+
+
+@router.post("/generate-image")
+def api_generate_image(req: ImageGenRequest):
+    """Generate an image using available provider or return demo preview with clear status."""
+    from src.multivision.media_providers import ImageGenerationProvider
+    res = ImageGenerationProvider.generate(req.prompt)
+    return res

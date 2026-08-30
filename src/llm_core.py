@@ -1791,6 +1791,15 @@ def llm_call(url: str, model: str, messages: List[Dict], temperature: float = LL
              max_tokens: int = LLMConfig.DEFAULT_MAX_TOKENS, headers: Optional[Dict] = None, 
              timeout: int = LLMConfig.DEFAULT_TIMEOUT, prompt_type: Optional[str] = None) -> str:
     """Synchronous LLM call with optional prompt type enhancement."""
+    from src.multivision.providers.manager import get_provider_manager, is_demo_mode_forced
+    from src.multivision.providers.base import ProviderRequest, ProviderMessage
+
+    if is_demo_mode_forced() or url in ("demo", "/api/multivision/chat", "") or "demo" in str(url).lower():
+        mgr = get_provider_manager()
+        req_msgs = [ProviderMessage(role=m.get("role", "user"), content=m.get("content", "")) for m in messages]
+        req = ProviderRequest(model=model, messages=req_msgs, temperature=temperature, max_tokens=max_tokens)
+        return mgr.demo_provider._generate_demo_content(req)
+
     h = _provider_headers(_detect_provider(url))
     # Tolerate headers that arrive as a JSON string (some sessions stored them
     # double-encoded) — otherwise h.update() throws "dictionary update sequence
@@ -1963,6 +1972,16 @@ async def llm_call_async(
     workload: str = "foreground",
 ) -> str:
     """Asynchronous LLM call using httpx with connection pooling, timeout, retry logic, and performance logging."""
+    from src.multivision.providers.manager import get_provider_manager, is_demo_mode_forced
+    from src.multivision.providers.base import ProviderRequest, ProviderMessage
+
+    if is_demo_mode_forced() or url in ("demo", "/api/multivision/chat", "") or "demo" in str(url).lower():
+        mgr = get_provider_manager()
+        req_msgs = [ProviderMessage(role=m.get("role", "user"), content=m.get("content", "")) for m in messages]
+        req = ProviderRequest(model=model, messages=req_msgs, temperature=temperature, max_tokens=max_tokens)
+        resp = await mgr.chat(req)
+        return resp.content
+
     provider = _detect_provider(url)
     messages_copy = _sanitize_llm_messages(messages)
 
@@ -2167,6 +2186,19 @@ async def _stream_llm_inner(url: str, model: str, messages: List[Dict], temperat
       - event: error                       — errors
       - data: [DONE]                       — end of stream
     """
+    from src.multivision.providers.manager import get_provider_manager, is_demo_mode_forced
+    from src.multivision.providers.base import ProviderRequest, ProviderMessage
+
+    if is_demo_mode_forced() or url in ("demo", "/api/multivision/chat", "") or "demo" in str(url).lower():
+        mgr = get_provider_manager()
+        req_msgs = [ProviderMessage(role=m.get("role", "user"), content=m.get("content", "")) for m in messages]
+        req = ProviderRequest(model=model, messages=req_msgs, temperature=temperature, max_tokens=max_tokens)
+        async for chunk in mgr.chat_stream(req):
+            if chunk.delta:
+                yield f'data: {json.dumps({"delta": chunk.delta})}\n\n'
+        yield "data: [DONE]\n\n"
+        return
+
     provider = _detect_provider(url)
     messages_copy = _sanitize_llm_messages(messages)
 

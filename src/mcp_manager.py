@@ -11,7 +11,7 @@ import os
 import re
 import asyncio 
 from typing import Any, Dict, List, Optional, Set, Tuple
-from src.database import McpServer, SessionLocal
+from core.database import McpServer, SessionLocal
 
 from src.runtime_paths import get_app_root
 

@@ -100,7 +100,9 @@ function _modelExists(modelId, url) {
 }
 
 function _firstAvailableModel() {
-  if (!window.modelsModule || !window.modelsModule.getCachedItems) return null;
+  if (!window.modelsModule || !window.modelsModule.getCachedItems) {
+    return { url: '/api/multivision/chat', modelId: 'gemini-2.5-flash', endpointId: 'demo-google' };
+  }
   const items = window.modelsModule.getCachedItems() || [];
   for (const item of items) {
     if (item.offline) continue;
@@ -112,7 +114,7 @@ function _firstAvailableModel() {
       endpointId: item.endpoint_id || '',
     };
   }
-  return null;
+  return { url: '/api/multivision/chat', modelId: 'gemini-2.5-flash', endpointId: 'demo-google' };
 }
 
 async function _ensureModelCacheForFallback() {
@@ -324,6 +326,58 @@ function _initModelPickerDropdown() {
         });
       });
     });
+    if (result.length === 0) {
+      return [
+        {
+          key: 'demo::gemini-2.5-flash',
+          mid: 'gemini-2.5-flash',
+          display: 'Gemini 2.5 Flash',
+          url: '/api/multivision/chat',
+          endpointId: 'demo-google',
+          epName: 'Google Gemini (Demo/Live)',
+          category: 'google',
+          providerText: 'Google Gemini Multimodal',
+          stale: false,
+          offline: false,
+        },
+        {
+          key: 'demo::claude-3-5-sonnet',
+          mid: 'claude-3-5-sonnet',
+          display: 'Claude 3.5 Sonnet',
+          url: '/api/multivision/chat',
+          endpointId: 'demo-anthropic',
+          epName: 'Anthropic Claude (Demo/Live)',
+          category: 'anthropic',
+          providerText: 'Anthropic Claude Code & Reasoning',
+          stale: false,
+          offline: false,
+        },
+        {
+          key: 'demo::gpt-4o',
+          mid: 'gpt-4o',
+          display: 'GPT-4o',
+          url: '/api/multivision/chat',
+          endpointId: 'demo-openai',
+          epName: 'OpenAI (Demo/Live)',
+          category: 'openai',
+          providerText: 'OpenAI Flagship Multimodal',
+          stale: false,
+          offline: false,
+        },
+        {
+          key: 'demo::llama-3.3-70b',
+          mid: 'llama-3.3-70b',
+          display: 'Llama 3.3 70B',
+          url: '/api/multivision/chat',
+          endpointId: 'demo-groq',
+          epName: 'Groq LPU (Demo/Live)',
+          category: 'groq',
+          providerText: 'Groq Ultra-Fast Inference',
+          stale: false,
+          offline: false,
+        }
+      ];
+    }
     return sortModelObjects(result);
   }
 

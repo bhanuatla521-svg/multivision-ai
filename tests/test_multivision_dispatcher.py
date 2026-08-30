@@ -1,13 +1,15 @@
+import os
+import pytest
 from tests.helpers.cli_loader import load_script
 
 
-def test_is_runnable_subcommand_requires_executable_file(tmp_path):
-    cli = load_script("odysseus")
-    sub = tmp_path / "odysseus-demo"
+def test_is_runnable_subcommand_requires_executable_file(tmp_path, monkeypatch):
+    cli = load_script("multivision")
+    sub = tmp_path / "multivision-demo"
     sub.write_text("#!/bin/sh\n")
-    sub.chmod(0o644)
 
+    monkeypatch.setattr(os, "access", lambda p, mode: False)
     assert cli._is_runnable_subcommand(sub) is False
 
-    sub.chmod(0o755)
+    monkeypatch.setattr(os, "access", lambda p, mode: True)
     assert cli._is_runnable_subcommand(sub) is True
