@@ -537,36 +537,43 @@ GET /api/multivision/report?format=csv
 
 ```mermaid
 flowchart TD
-    U[User / Client] --> UI[MultiVision Web UI]
-    UI --> R[Task & Modality Router]
+    U["User / Client"] --> UI["MultiVision Web UI"]
+    UI --> R["Task & Modality Router"]
     
-    subgraph MultiVision Control Core
-        R --> TD[Task Detector]
-        R --> MD[Modality Detector]
-        TD --> CM[Capability Matcher]
+    subgraph Core ["MultiVision Control Core"]
+        R --> TD["Task Detector"]
+        R --> MD["Modality Detector"]
+        TD --> CM["Capability Matcher"]
         MD --> CM
-        CM --> PF[Pricing & Free-First Filter]
-        PF --> SE[Model Scoring Engine]
-        SE --> SM[Selected Primary Model]
-        SM --> FB[Fallback Engine]
+        CM --> PF["Pricing & Free-First Filter"]
+        PF --> SE["Model Scoring Engine"]
+        SE --> SM["Selected Primary Model"]
+        SM --> FB["Fallback Engine"]
     end
 
-    subgraph AI Provider Gateways
-        FB --> G[Google Gemini API]
-        FB --> O[OpenRouter API]
-        FB --> Q[Groq Cloud API]
-        FB --> N[NVIDIA NIM API]
-        FB --> HF[Hugging Face Inference]
-        FB --> A[Anthropic API]
-        FB --> OP[OpenAI API]
-        FB --> L[Ollama Local Engine]
+    subgraph Gateways ["AI Provider Gateways"]
+        FB --> G["Google Gemini API"]
+        FB --> O["OpenRouter API"]
+        FB --> Q["Groq Cloud API"]
+        FB --> N["NVIDIA NIM API"]
+        FB --> HF["Hugging Face Inference"]
+        FB --> A["Anthropic API"]
+        FB --> OP["OpenAI API"]
+        FB --> L["Ollama Local Engine"]
     end
 
-    subgraph Observability & Cost Plane
-        G & O & Q & N & HF & A & OP & L --> LOG[AI Usage Logger]
-        LOG --> CE[Cost Engine]
-        LOG --> PH[Provider Health Monitor]
-        CE --> REP[Report Generator]
+    subgraph Observability ["Observability & Cost Plane"]
+        G --> LOG["AI Usage Logger"]
+        O --> LOG
+        Q --> LOG
+        N --> LOG
+        HF --> LOG
+        A --> LOG
+        OP --> LOG
+        L --> LOG
+        LOG --> CE["Cost Engine"]
+        LOG --> PH["Provider Health Monitor"]
+        CE --> REP["Report Generator"]
         PH --> UI
         REP --> UI
     end
