@@ -537,46 +537,45 @@ GET /api/multivision/report?format=csv
 
 ```mermaid
 flowchart TD
-    U["User / Client"] --> UI["MultiVision Web UI"]
-    UI --> R["Task & Modality Router"]
+    User["User / Client"] --> WebUI["MultiVision Web UI"]
+    WebUI --> Router["Task & Modality Router"]
     
     subgraph Core ["MultiVision Control Core"]
-        R --> TD["Task Detector"]
-        R --> MD["Modality Detector"]
-        TD --> CM["Capability Matcher"]
-        MD --> CM
-        CM --> PF["Pricing & Free-First Filter"]
-        PF --> SE["Model Scoring Engine"]
-        SE --> SM["Selected Primary Model"]
-        SM --> FB["Fallback Engine"]
+        Router --> TaskDet["Task & Modality Detector"]
+        TaskDet --> CapMatch["Capability Matcher"]
+        CapMatch --> PriceFilter["Pricing & Free-First Filter"]
+        PriceFilter --> Scoring["Model Scoring Engine"]
+        Scoring --> SelectModel["Selected Primary Model"]
+        SelectModel --> Fallback["Fallback Engine"]
     end
 
     subgraph Gateways ["AI Provider Gateways"]
-        FB --> G["Google Gemini API"]
-        FB --> O["OpenRouter API"]
-        FB --> Q["Groq Cloud API"]
-        FB --> N["NVIDIA NIM API"]
-        FB --> HF["Hugging Face Inference"]
-        FB --> A["Anthropic API"]
-        FB --> OP["OpenAI API"]
-        FB --> L["Ollama Local Engine"]
+        Fallback --> Gemini["Google Gemini API"]
+        Fallback --> OpenRouter["OpenRouter API"]
+        Fallback --> Groq["Groq Cloud API"]
+        Fallback --> Nvidia["NVIDIA NIM API"]
+        Fallback --> HF["Hugging Face Inference"]
+        Fallback --> Anthropic["Anthropic API"]
+        Fallback --> OpenAI["OpenAI API"]
+        Fallback --> Ollama["Ollama Local Engine"]
     end
 
     subgraph Observability ["Observability & Cost Plane"]
-        G --> LOG["AI Usage Logger"]
-        O --> LOG
-        Q --> LOG
-        N --> LOG
-        HF --> LOG
-        A --> LOG
-        OP --> LOG
-        L --> LOG
-        LOG --> CE["Cost Engine"]
-        LOG --> PH["Provider Health Monitor"]
-        CE --> REP["Report Generator"]
-        PH --> UI
-        REP --> UI
+        Gemini --> Logger["AI Usage Logger"]
+        OpenRouter --> Logger
+        Groq --> Logger
+        Nvidia --> Logger
+        HF --> Logger
+        Anthropic --> Logger
+        OpenAI --> Logger
+        Ollama --> Logger
+        Logger --> CostEngine["Cost Engine"]
+        Logger --> HealthMon["Provider Health Monitor"]
+        CostEngine --> Reports["Audit Reports & Telemetry"]
+        HealthMon --> Reports
     end
+
+    Reports --> Dashboard["Live Dashboard & Control Center"]
 ```
 
 ---
