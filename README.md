@@ -2,7 +2,7 @@
 
 **MultiVision AI** is a free-first, multimodal AI control center that lets you discover, compare, route, and analyze AI models from multiple providers — all from one beautiful dashboard.
 
-![MultiVision AI](static/icons/multivision-logo.png)
+![MultiVision AI — Chat Interface](docs/preview.png)
 
 ---
 
