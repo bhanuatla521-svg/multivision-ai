@@ -269,7 +269,7 @@ if AUTH_ENABLED:
         "/login",
         "/ai-models",
     }
-    AUTH_EXEMPT_PREFIXES = ["/static", "/api/multivision", "/api/generated-images"]
+    AUTH_EXEMPT_PREFIXES = ["/static", "/api/multivision", "/api/generated-images", "/api/auth/oauth"]
     # Dynamic paths whose own handler proves identity via a path-embedded
     # secret instead of the session/bearer auth. The route handler at
     # routes/task_routes.py validates the per-task `webhook_token` itself

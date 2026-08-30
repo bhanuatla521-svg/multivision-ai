@@ -661,6 +661,10 @@ Navigate in your browser to:
 | `FIREWORKS_API_KEY` | Optional | Fireworks AI | Fast open-source inference |
 | `XAI_API_KEY` | Optional | xAI | Grok-2 language and vision models |
 | `OLLAMA_BASE_URL` | Optional | Ollama Local | Local offline LLMs (`http://127.0.0.1:11434`) |
+| `GOOGLE_CLIENT_ID` | Optional | Google OAuth | Enables 1-click Google sign-in on login page |
+| `GOOGLE_CLIENT_SECRET` | Optional | Google OAuth | Google OAuth 2.0 client secret |
+| `GITHUB_CLIENT_ID` | Optional | GitHub OAuth | Enables 1-click GitHub sign-in on login page |
+| `GITHUB_CLIENT_SECRET` | Optional | GitHub OAuth | GitHub OAuth 2.0 client secret |
 | `LOCALHOST_BYPASS` | Optional | System | Dev-mode authentication bypass (default: `true`) |
 
 ---

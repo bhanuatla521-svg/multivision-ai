@@ -249,6 +249,74 @@
     vertical-align: -3px;
   }
   @keyframes login-spin { to { transform: rotate(360deg); } }
+
+  /* OAuth Social Login Buttons & Divider */
+  .oauth-container { margin-bottom: 1.2rem; }
+  .oauth-buttons { display: flex; flex-direction: column; gap: 0.65rem; }
+  .oauth-btn {
+    width: 100%;
+    display: flex; align-items: center; justify-content: center; gap: 0.65rem;
+    padding: 0.65rem 1rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600;
+    cursor: pointer; transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    text-decoration: none; border: 1px solid transparent; user-select: none;
+  }
+  .oauth-btn:hover { transform: translateY(-1px); }
+  .oauth-btn:active { transform: translateY(0); }
+  .oauth-btn-google {
+    background: #ffffff; color: #1f1f1f; border-color: #d1d5db;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .oauth-btn-google:hover {
+    background: #f9fafb; border-color: #9ca3af;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  }
+  .oauth-btn-github {
+    background: #24292e; color: #ffffff; border-color: #444d56;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .oauth-btn-github:hover {
+    background: #2f363d; border-color: #6a737d;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .oauth-icon { width: 18px; height: 18px; flex-shrink: 0; display: block; }
+  .oauth-divider {
+    display: flex; align-items: center; text-align: center;
+    margin: 1.15rem 0 0.85rem;
+    color: color-mix(in srgb, var(--fg) 42%, transparent);
+    font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .oauth-divider::before, .oauth-divider::after {
+    content: ''; flex: 1; border-bottom: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+  }
+  .oauth-divider span { padding: 0 0.65rem; }
+
+  /* OAuth Modal for Dev / Key Setup */
+  .oauth-modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.72);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+  }
+  .oauth-modal-overlay.active { opacity: 1; pointer-events: auto; }
+  .oauth-modal {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    padding: 1.6rem; width: 440px; max-width: 92vw; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  }
+  .oauth-modal h3 { font-size: 1.15rem; margin-bottom: 0.6rem; color: var(--fg); }
+  .oauth-modal p { font-size: 0.84rem; line-height: 1.45; color: color-mix(in srgb, var(--fg) 75%, transparent); margin-bottom: 1rem; }
+  .oauth-modal pre {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+    padding: 0.65rem; font-size: 0.78rem; overflow-x: auto; margin-bottom: 1.2rem;
+    color: var(--green);
+  }
+  .oauth-modal-actions { display: flex; gap: 0.6rem; justify-content: flex-end; }
+  .oauth-modal-btn {
+    width: auto; padding: 0.5rem 0.9rem; font-size: 0.85rem; border-radius: 6px;
+  }
+  .oauth-modal-btn-secondary {
+    background: var(--bg); color: var(--fg); border: 1px solid var(--border);
+  }
+  .oauth-modal-btn-secondary:hover { background: color-mix(in srgb, var(--bg) 80%, white); }
 </style>
 </head>
 <body>
@@ -259,6 +327,32 @@
   <p class="setup-note" id="setupNote" style="display:none"></p>
 
   <div class="error" id="error" role="alert" aria-live="assertive"></div>
+
+  <!-- Social Logins (Google & GitHub) -->
+  <div class="oauth-container" id="oauthContainer">
+    <div class="oauth-buttons">
+      <button type="button" class="oauth-btn oauth-btn-google" id="googleLoginBtn" aria-label="Continue with Google">
+        <svg class="oauth-icon" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+        </svg>
+        <span>Continue with Google</span>
+      </button>
+
+      <button type="button" class="oauth-btn oauth-btn-github" id="githubLoginBtn" aria-label="Continue with GitHub">
+        <svg class="oauth-icon" viewBox="0 0 24 24" fill="currentColor">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+        </svg>
+        <span>Continue with GitHub</span>
+      </button>
+    </div>
+
+    <div class="oauth-divider">
+      <span>or continue with password</span>
+    </div>
+  </div>
 
   <form id="authForm" autocomplete="on">
     <label for="username">Username</label>
@@ -297,10 +391,37 @@
   </div>
 </main>
 
+<!-- OAuth Setup / Dev Simulation Modal -->
+<div class="oauth-modal-overlay" id="oauthModal" role="dialog" aria-modal="true" aria-labelledby="oauthModalTitle">
+  <div class="oauth-modal">
+    <h3 id="oauthModalTitle">Configure OAuth Provider</h3>
+    <p id="oauthModalDesc">To enable live authentication with this provider, add your OAuth credentials to your <code>.env</code> file and restart the server:</p>
+    <pre id="oauthModalCode">GOOGLE_CLIENT_ID=your_client_id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your_client_secret</pre>
+    <div class="oauth-modal-actions">
+      <button type="button" class="oauth-modal-btn oauth-modal-btn-secondary" id="oauthModalClose">Cancel</button>
+      <button type="button" class="oauth-modal-btn" id="oauthDevLoginBtn">Quick Dev Login</button>
+    </div>
+  </div>
+</div>
+
 <footer class="version-label" id="version-label"></footer>
 
 <script nonce="{{CSP_NONCE}}">
 (async () => {
+  // Check for error in query string
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlErr = urlParams.get('error');
+    if (urlErr) {
+      const errBox = document.getElementById('error');
+      if (errBox) {
+        errBox.textContent = decodeURIComponent(urlErr);
+        errBox.style.display = 'block';
+      }
+    }
+  } catch(e) {}
+
   // Load version
   try {
     const vr = await fetch('/api/version');
@@ -326,6 +447,84 @@
   const toggleArea = document.getElementById('toggleArea');
   const toggleLink = document.getElementById('toggleLink');
   const toggleText = document.getElementById('toggleText');
+  const oauthContainer = document.getElementById('oauthContainer');
+
+  const oauthModal = document.getElementById('oauthModal');
+  const oauthModalTitle = document.getElementById('oauthModalTitle');
+  const oauthModalCode = document.getElementById('oauthModalCode');
+  const oauthModalClose = document.getElementById('oauthModalClose');
+  const oauthDevLoginBtn = document.getElementById('oauthDevLoginBtn');
+  let selectedOAuthProvider = 'google';
+
+  // OAuth Provider Status
+  let oauthProviders = {
+    google: { enabled: false, configured: false },
+    github: { enabled: false, configured: false }
+  };
+  try {
+    const opRes = await fetch('/api/auth/oauth/providers', { credentials: 'same-origin' });
+    if (opRes.ok) oauthProviders = await opRes.json();
+  } catch(e) {}
+
+  function openOAuthModal(provider) {
+    selectedOAuthProvider = provider;
+    oauthModalTitle.textContent = `Configure ${provider === 'google' ? 'Google' : 'GitHub'} OAuth`;
+    if (provider === 'google') {
+      oauthModalCode.textContent = `GOOGLE_CLIENT_ID=your_id.apps.googleusercontent.com\nGOOGLE_CLIENT_SECRET=GOCSPX-your_secret`;
+    } else {
+      oauthModalCode.textContent = `GITHUB_CLIENT_ID=your_github_client_id\nGITHUB_CLIENT_SECRET=your_github_client_secret`;
+    }
+    oauthModal.classList.add('active');
+  }
+
+  function closeOAuthModal() {
+    oauthModal.classList.remove('active');
+  }
+
+  if (oauthModalClose) oauthModalClose.addEventListener('click', closeOAuthModal);
+  if (oauthModal) oauthModal.addEventListener('click', (e) => { if (e.target === oauthModal) closeOAuthModal(); });
+
+  async function handleOAuthClick(provider) {
+    errEl.style.display = 'none';
+    const cfg = oauthProviders[provider];
+    if (cfg && cfg.configured) {
+      window.location.href = `/api/auth/oauth/login/${provider}`;
+      return;
+    }
+    // If not configured, show guidance modal with option for instant dev login
+    openOAuthModal(provider);
+  }
+
+  const googleBtn = document.getElementById('googleLoginBtn');
+  const githubBtn = document.getElementById('githubLoginBtn');
+  if (googleBtn) googleBtn.addEventListener('click', () => handleOAuthClick('google'));
+  if (githubBtn) githubBtn.addEventListener('click', () => handleOAuthClick('github'));
+
+  if (oauthDevLoginBtn) {
+    oauthDevLoginBtn.addEventListener('click', async () => {
+      closeOAuthModal();
+      errEl.style.display = 'none';
+      try {
+        oauthDevLoginBtn.disabled = true;
+        const devEmail = `${selectedOAuthProvider}_user@multivision.local`;
+        const devName = `${selectedOAuthProvider.charAt(0).toUpperCase() + selectedOAuthProvider.slice(1)} User`;
+        const res = await fetch('/api/auth/oauth/dev-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ provider: selectedOAuthProvider, email: devEmail, name: devName })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || 'Dev login failed');
+        window.location.replace('/');
+      } catch (err) {
+        errEl.textContent = err.message;
+        errEl.style.display = 'block';
+      } finally {
+        oauthDevLoginBtn.disabled = false;
+      }
+    });
+  }
 
   let mode = 'login'; // 'login' | 'signup' | 'setup'
   let signupAllowed = false;
@@ -343,6 +542,7 @@
       submitBtn.textContent = 'Create Admin Account';
       toggleArea.style.display = 'none';
       rememberToggle.style.display = 'none';
+      if (oauthContainer) oauthContainer.style.display = 'none';
     } else if (m === 'signup') {
       setupNote.style.display = 'none';
       confirmGroup.style.display = 'block';
@@ -351,6 +551,7 @@
       toggleText.textContent = 'Already have an account? ';
       toggleLink.textContent = 'Sign in';
       rememberToggle.style.display = 'none';
+      if (oauthContainer) oauthContainer.style.display = 'block';
     } else {
       setupNote.style.display = 'none';
       confirmGroup.style.display = 'none';
@@ -359,6 +560,7 @@
       toggleText.textContent = "Don't have an account? ";
       toggleLink.textContent = 'Sign up';
       rememberToggle.style.display = '';
+      if (oauthContainer) oauthContainer.style.display = 'block';
     }
   }
 

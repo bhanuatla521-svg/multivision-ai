@@ -1,11 +1,13 @@
 """Authentication routes — login, logout, signup, status, user management."""
 
 from fastapi import APIRouter, Request, Response, HTTPException
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 from typing import Optional
 import asyncio
 import logging
 import os
+import urllib.parse
 
 import json
 import re
@@ -80,6 +82,13 @@ class SetAdminRequest(BaseModel):
 
 class SetOpenRegistrationRequest(BaseModel):
     enabled: bool
+
+
+class OAuthDevLoginRequest(BaseModel):
+    provider: str
+    email: Optional[str] = None
+    name: Optional[str] = None
+
 
 SESSION_COOKIE = "odysseus_session"
 
@@ -832,5 +841,138 @@ def setup_auth_routes(auth_manager: AuthManager) -> APIRouter:
         if result.get("exit_code", 1) == 0:
             return {"ok": True, "message": "Connection successful"}
         return {"ok": False, "message": (result.get("error") or "Connection failed")[:300]}
+
+    # ========= OAUTH 2.0 (GOOGLE & GITHUB) =========
+    @router.get("/oauth/providers")
+    async def get_oauth_providers():
+        """Return configured OAuth providers and their status."""
+        from src.oauth_service import OAuthService
+        return OAuthService.get_providers_status()
+
+    @router.get("/oauth/login/{provider}")
+    async def oauth_login(provider: str, request: Request, redirect: Optional[str] = "/"):
+        """Initiate OAuth login with Google or GitHub."""
+        from src.oauth_service import OAuthService
+        provider = provider.lower()
+        if provider not in ("google", "github"):
+            raise HTTPException(400, f"Unsupported provider: {provider}")
+
+        host = request.headers.get("x-forwarded-host") or request.headers.get("host") or "localhost:7000"
+        proto = request.headers.get("x-forwarded-proto") or request.url.scheme or "http"
+        redirect_uri = f"{proto}://{host}/api/auth/oauth/callback/{provider}"
+
+        state = OAuthService.create_state(provider=provider, redirect_path=redirect or "/")
+        auth_url, err = OAuthService.build_authorization_url(provider, redirect_uri, state)
+        if err:
+            return {
+                "ok": False,
+                "error": err,
+                "provider": provider,
+                "configured": False,
+            }
+
+        accept = request.headers.get("accept", "")
+        if "application/json" in accept and "text/html" not in accept:
+            return {"ok": True, "auth_url": auth_url, "state": state}
+        return RedirectResponse(url=auth_url, status_code=302)
+
+    @router.get("/oauth/callback/{provider}")
+    async def oauth_callback(
+        provider: str,
+        request: Request,
+        response: Response,
+        code: Optional[str] = None,
+        state: Optional[str] = None,
+        error: Optional[str] = None,
+        error_description: Optional[str] = None,
+    ):
+        """Handle OAuth callback from Google or GitHub."""
+        from src.oauth_service import OAuthService
+        provider = provider.lower()
+        if error:
+            err_msg = error_description or error or "OAuth authorization was denied or failed"
+            return RedirectResponse(url=f"/login?error={urllib.parse.quote(err_msg)}", status_code=302)
+
+        if not code or not state:
+            return RedirectResponse(url=f"/login?error={urllib.parse.quote('Missing OAuth code or state parameter')}", status_code=302)
+
+        state_data = OAuthService.verify_state(state, provider)
+        if not state_data:
+            return RedirectResponse(url=f"/login?error={urllib.parse.quote('Invalid or expired OAuth state session. Please try again.')}", status_code=302)
+
+        host = request.headers.get("x-forwarded-host") or request.headers.get("host") or "localhost:7000"
+        proto = request.headers.get("x-forwarded-proto") or request.url.scheme or "http"
+        redirect_uri = f"{proto}://{host}/api/auth/oauth/callback/{provider}"
+
+        user_info, err = await OAuthService.exchange_code_and_get_user(provider, code, redirect_uri)
+        if err or not user_info:
+            return RedirectResponse(url=f"/login?error={urllib.parse.quote(err or 'Failed to fetch user profile')}", status_code=302)
+
+        username = await asyncio.to_thread(
+            auth_manager.get_or_create_oauth_user,
+            provider=user_info["provider"],
+            oauth_id=user_info["oauth_id"],
+            email=user_info.get("email"),
+            username_hint=user_info.get("username_hint"),
+            display_name=user_info.get("name"),
+            avatar_url=user_info.get("avatar_url"),
+        )
+        if not username:
+            return RedirectResponse(url=f"/login?error={urllib.parse.quote('Failed to register or link OAuth account')}", status_code=302)
+
+        token = await asyncio.to_thread(auth_manager.create_session_trusted, username)
+        if not token:
+            return RedirectResponse(url=f"/login?error={urllib.parse.quote('Failed to issue session token')}", status_code=302)
+
+        target_redirect = state_data.get("redirect_path") or "/"
+        resp = RedirectResponse(url=target_redirect, status_code=302)
+        resp.set_cookie(
+            key=SESSION_COOKIE,
+            value=token,
+            httponly=True,
+            samesite="lax",
+            secure=os.getenv("SECURE_COOKIES", "false").lower() == "true",
+            path="/",
+            max_age=TOKEN_TTL,
+        )
+        return resp
+
+    @router.post("/oauth/dev-login")
+    async def oauth_dev_login(body: OAuthDevLoginRequest, request: Request, response: Response):
+        """Developer/simulation OAuth sign-in for testing when live keys are pending."""
+        provider = body.provider.lower()
+        if provider not in ("google", "github"):
+            raise HTTPException(400, f"Unsupported provider: {provider}")
+
+        email = (body.email or f"{provider}_user@example.com").strip()
+        name = body.name or f"{provider.capitalize()} User"
+        mock_oauth_id = f"dev_{provider}_{abs(hash(email)) % 1000000}"
+
+        username = await asyncio.to_thread(
+            auth_manager.get_or_create_oauth_user,
+            provider=provider,
+            oauth_id=mock_oauth_id,
+            email=email,
+            username_hint=email.split("@")[0] if "@" in email else email,
+            display_name=name,
+            avatar_url=f"https://api.dicebear.com/7.x/identicon/svg?seed={provider}_{mock_oauth_id}",
+        )
+        if not username:
+            raise HTTPException(500, "Failed to create or link dev account")
+
+        token = await asyncio.to_thread(auth_manager.create_session_trusted, username)
+        if not token:
+            raise HTTPException(500, "Failed to issue session token")
+
+        response.set_cookie(
+            key=SESSION_COOKIE,
+            value=token,
+            httponly=True,
+            samesite="lax",
+            secure=os.getenv("SECURE_COOKIES", "false").lower() == "true",
+            path="/",
+            max_age=TOKEN_TTL,
+        )
+        return {"ok": True, "username": username, "provider": provider}
 
     return router

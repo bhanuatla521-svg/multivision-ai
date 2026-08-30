@@ -289,6 +289,96 @@ class AuthManager:
         logger.info(f"Created user '{username}' (admin={is_admin})")
         return True
 
+    def get_or_create_oauth_user(
+        self,
+        provider: str,
+        oauth_id: str,
+        email: Optional[str] = None,
+        username_hint: Optional[str] = None,
+        display_name: Optional[str] = None,
+        avatar_url: Optional[str] = None,
+    ) -> Optional[str]:
+        """Find or create a user authenticated via OAuth (e.g., 'google', 'github').
+        Returns the username on success, or None on failure."""
+        provider = str(provider or "").strip().lower()
+        oauth_id = str(oauth_id or "").strip()
+        if not provider or not oauth_id:
+            return None
+
+        email_clean = (email or "").strip().lower() if email else ""
+
+        with self._config_lock:
+            if "users" not in self._config:
+                self._config["users"] = {}
+
+            # 1. Match by provider + oauth_id
+            for u_name, u_data in self.users.items():
+                if (
+                    u_data.get("oauth_provider") == provider
+                    and str(u_data.get("oauth_id", "")).strip() == oauth_id
+                ):
+                    # Update metadata if needed
+                    updated = False
+                    if email_clean and not u_data.get("email"):
+                        u_data["email"] = email_clean
+                        updated = True
+                    if avatar_url and not u_data.get("avatar_url"):
+                        u_data["avatar_url"] = avatar_url
+                        updated = True
+                    if display_name and not u_data.get("display_name"):
+                        u_data["display_name"] = display_name
+                        updated = True
+                    if updated:
+                        self._save()
+                    return u_name
+
+            # 2. Match by email (link OAuth account)
+            if email_clean:
+                for u_name, u_data in self.users.items():
+                    if u_data.get("email", "").strip().lower() == email_clean:
+                        u_data["oauth_provider"] = provider
+                        u_data["oauth_id"] = oauth_id
+                        if avatar_url:
+                            u_data["avatar_url"] = avatar_url
+                        if display_name:
+                            u_data["display_name"] = display_name
+                        self._save()
+                        logger.info(f"Linked OAuth ({provider}) to existing user '{u_name}' via email")
+                        return u_name
+
+            # 3. Create new user
+            # Sanitize candidate username
+            raw_hint = username_hint or (email_clean.split("@")[0] if email_clean else "") or f"{provider}_{oauth_id[:6]}"
+            import re as _re
+            candidate = _re.sub(r"[^a-zA-Z0-9_-]", "", raw_hint).strip().lower()
+            if not candidate or len(candidate) < 2 or candidate in RESERVED_USERNAMES:
+                candidate = f"{provider}_{secrets.token_hex(3)}"
+
+            base_candidate = candidate
+            idx = 1
+            while candidate in self.users or candidate in RESERVED_USERNAMES:
+                candidate = f"{base_candidate}{idx}"
+                idx += 1
+
+            # First user ever gets admin automatically
+            is_admin = len(self.users) == 0
+            random_pw = secrets.token_urlsafe(32)
+
+            self._config["users"][candidate] = {
+                "password_hash": _hash_password(random_pw),
+                "created": time.time(),
+                "is_admin": is_admin,
+                "privileges": dict(ADMIN_PRIVILEGES if is_admin else DEFAULT_PRIVILEGES),
+                "oauth_provider": provider,
+                "oauth_id": oauth_id,
+                "email": email_clean,
+                "display_name": display_name or "",
+                "avatar_url": avatar_url or "",
+            }
+            self._save()
+            logger.info(f"Created OAuth user '{candidate}' via {provider} (admin={is_admin})")
+            return candidate
+
     def delete_user(self, username: str, requesting_user: str) -> bool:
         """Delete a user. Only admins can delete, and can't delete themselves.
 
