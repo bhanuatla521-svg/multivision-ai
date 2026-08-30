@@ -70,20 +70,8 @@ docker compose up -d --build
 ## 🔑 3. Logging in & Adding API Keys
 
 1. Open your web browser and go to: **[http://localhost:7000](http://localhost:7000)** (or `http://localhost:7860` on Mac).
-2. **Login Options**:
-   - **Google & GitHub Login**: Click **Continue with Google** or **Continue with GitHub** on the login page for 1-click authentication.
-   - **Username & Password**: Use the initial admin credentials printed in the terminal during setup (username: `admin`).
-3. **Setting up Live Google / GitHub OAuth (Optional)**:
-   - Add your Google or GitHub OAuth App Client ID & Secret in your `.env` file:
-     ```env
-     GOOGLE_CLIENT_ID=your_id.apps.googleusercontent.com
-     GOOGLE_CLIENT_SECRET=GOCSPX-your_secret
-
-     GITHUB_CLIENT_ID=your_github_client_id
-     GITHUB_CLIENT_SECRET=your_github_client_secret
-     ```
-   - If keys are not set, you can use the built-in **Quick Dev Login** for instant local testing!
-4. **Using Free Models**:
+2. During the first launch, the terminal prints an initial admin password (username: `admin`).
+3. **Using Free Models**:
    - MultiVision works out-of-the-box with free-tier providers and local models.
    - To connect your own API keys (e.g. OpenAI, Anthropic, Gemini, Groq, OpenRouter), click **Settings ⚙️ → API Keys**.
    - If you run **Ollama** locally, MultiVision automatically discovers your local models!
