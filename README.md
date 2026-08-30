@@ -12,6 +12,8 @@
 
 MultiVision AI is a free-first multimodal AI platform that brings text, images, PDFs, audio, and video intelligence into one unified workspace. It automatically analyzes the task, evaluates available models, selects the best eligible model based on capability, performance, availability, and cost, and routes the request through free, free-tier, or local models whenever possible.
 
+> 🔰 **New here? Check out the [Beginner's Quick Start Guide](BEGINNER_GUIDE.md) for 1-click step-by-step setup!**
+
 ![MultiVision AI — Chat Interface](docs/preview.png)
 
 ---
