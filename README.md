@@ -123,6 +123,124 @@ User Input (Prompt + Media Attachments)
 
 ---
 
+## 🔍 Detailed Deep-Dive into Every Feature
+
+### 1. 🧠 Searchable Model Intelligence Catalog
+- **Dynamic Registry:** Maintains real-time metadata on 50+ models spanning Google Gemini, Groq, OpenRouter, Ollama, Anthropic, and OpenAI.
+- **Multi-Filter Chips:** Instantly filter models by single or combined tags: `Free Only`, `Vision (Images)`, `Audio`, `Video`, `PDF / Documents`, `Coding`, and `Deep Reasoning`.
+- **Live Search Bar:** Instant client-side filtering on model names, provider names, or capability keywords.
+- **Granular Spec Cards:** Displays context windows (e.g. 1M+ tokens for Gemini 2.5), max output tokens, benchmark quality ratings (0–100), execution speed ratings (0–100), and input/output costs per million tokens.
+
+### 2. 📊 Interactive Model Distribution Chart
+- **Canvas-Rendered Bar Chart:** A sleek HTML5 Canvas bar chart rendered above the model catalog showing real-time distribution of available models grouped by provider (Google, Groq, OpenRouter, Ollama, Anthropic, etc.).
+- **Live State Persistence:** Features a toggle button (**🙈 Hide Chart** / **📊 Show Chart**) that saves user preference into browser `localStorage`, ensuring preference persists across refreshes.
+- **Responsive Layout:** Dynamically resizes on window dimensions with custom gradients and tick axes matching the Claude Warm design theme.
+
+### 3. 🏆 Best Model by Task Recommender
+- **12 Workload Categories:** Provides instant algorithmic recommendations for:
+  - 💬 **Chat & Conversation:** Prioritizes fluency, latency, and cost.
+  - 🖼️ **Image Analysis & OCR:** Selects models with dedicated vision encoders.
+  - 📄 **PDF & Document Analysis:** Selects models with native document token ingestion or massive context capacity.
+  - 🎧 **Audio Transcription & Q&A:** Matches native multimodal audio listeners or Whisper gateways.
+  - 🎥 **Video Understanding:** Recommends models capable of processing temporal video tokens natively.
+  - 🧠 **Deep Reasoning:** Matches chain-of-thought models (`deepseek-r1`, `o1-mini`, `gemini-2.5-pro`).
+  - 💻 **Coding & Debugging:** Identifies top code-generation and debugging index models.
+  - 🔎 **Research & Long-Form Synthesis:** Recommends search-augmented and long-context architectures.
+  - 📊 **Structured Extraction:** Recommends models with strict JSON-schema enforcement.
+  - 🔄 **Cross-Modal Comparison:** Identifies unified models capable of ingesting multiple heterogeneous inputs.
+  - 🧩 **Agentic Workflows:** Filters for models with certified tool-calling capabilities.
+  - 📚 **Long Context (100k+):** Highlights models with million-token windows.
+- **Transparent Scoring Cards:** Shows exact breakdown of why a model was recommended, including capability matching, quality index, and pricing tier.
+
+### 4. ⚖️ Side-by-Side Model Comparison Matrix
+- **Dual-Model Comparator:** Allows users to pick any two models from any provider and compare them across all dimensions in a clear two-column comparison card.
+- **Differential Metrics:** Compares context window sizes, max output capacity, speed ratings, quality scores, and estimated cost per 1M input/output tokens.
+- **Modality Parity Checklist:** Visual checkmark matrix comparing Vision, Audio, Video, PDF, Reasoning, and Tool Calling support.
+
+### 5. ⚡ Real-Time Operations Inspector & Telemetry
+- **Complete Audit Trail:** Every single request made through MultiVision AI is recorded with an immutable telemetry record.
+- **Monitored Telemetry Fields:**
+  - `Timestamp` and unique `Request ID`
+  - `Provider` & `Actual Model` used
+  - `Task Category` and `Detected Modalities`
+  - `Execution Latency` in milliseconds
+  - `Prompt Tokens`, `Completion Tokens`, and `Total Tokens`
+  - `Pricing Tier` (FREE, FREE_TIER, PAID, UNKNOWN)
+  - `Estimated Cost (USD)`
+  - `Fallback Status` (whether an upstream error triggered an automatic model switch)
+- **Log Inspector Drawer:** Expand any log entry to view raw diagnostic headers and parameters.
+
+### 6. 💰 Cost Analytics & Budget Guard
+- **Accurate Spend Tracking:** Computes estimated cost in real-time based on actual token counts and provider pricing matrices.
+- **Provider & Model Breakdowns:** Segment total expenditures across Google, Groq, OpenRouter, and OpenAI.
+- **Modality-Specific Cost Tracking:** Separates text token costs from audio minute or image generation costs.
+- **Zero-Spend Assurance:** When Free Mode is active, potential cost is guaranteed $0.00.
+
+### 7. 🔮 Interactive Multimodal Routing Lab
+- **Simulation Testbench:** A dedicated testing tab where users can type any hypothetical prompt and select any combination of simulated attachments (e.g. `[image.png, manual.pdf, interview.mp3]`).
+- **Live Routing Decision Explanation:** Visualizes the entire router thought process:
+  1. Detects primary and secondary tasks.
+  2. Extracts required modalities.
+  3. Evaluates eligible candidate models.
+  4. Applies Free-First constraints.
+  5. Computes multi-factor scores and outputs the winner with detailed justification.
+
+### 8. 🩺 Automated System Health Analyzer
+- **Multi-Subsystem Diagnostic Check:** One-click automated diagnostic button that asynchronously pings **9 core endpoints**:
+  1. `/api/multivision/models` (Model Catalog API)
+  2. `/api/multivision/providers` (Provider Gateway API)
+  3. `/api/multivision/operations` (Operations Inspector API)
+  4. `/api/multivision/best-by-task` (Best-by-Task Recommender API)
+  5. `/api/multivision/report?format=json` (Report Generator API)
+  6. `/api/multivision/analyze` (Multimodal Routing Engine)
+  7. `/api/multivision/free-mode` (Free-First Configuration API)
+  8. `/` (Chat Workspace Root)
+  9. `/docs` (Swagger API Documentation)
+- **Live Latency & Status Cards:** Displays individual card indicators with HTTP status badges (✅ OK / ❌ Failed) and millisecond latency timers.
+- **Color-Coded Diagnostic Console:** Real-time log terminal streaming diagnostic details directly in the browser.
+
+### 9. 🛡️ Global Free-First Security Mode (Hackathon Mode)
+- **Header-Mounted One-Click Toggle:** Switch Free-First Mode `ON` or `OFF` at any time with a single click.
+- **Hard-Coded Spend Blocking:** When active, the system strictly drops any model that charges money per token or whose pricing cannot be verified.
+- **Multi-Tier Free Fallback:** In the event of an upstream 429 rate limit or 503 outage, cascades exclusively to alternate free or local models.
+
+### 10. 📄 Comprehensive Audit Report Exporter
+- **Multi-Format Export:** Generate full audit summaries in **Markdown (`.md`)**, **JSON (`.json`)**, or **CSV (`.csv`)**.
+- **Audit Scope:** Includes provider connection health, key configuration status, model capabilities matrix, task recommendations, real-time consumption metrics, and quota alerts.
+
+### 11. ⚙️ Customizable Settings Panel
+- **Accessible Gear Icon:** Quick settings modal located in the top navigation bar.
+- **Configurable Preferences:**
+  - **Default Startup Page:** Choose whether opening the root URL redirects to `🧠 AI Control Center`, `💬 Chat Workspace`, `⚡ Operations Inspector`, `💰 Cost Analytics`, or `🔮 Multimodal Lab`.
+  - **Chart Display:** Set default chart visibility to Show or Hide.
+  - **Free-First Default:** Set startup default for Free Mode (`ON` or `OFF`).
+- **Persistent Local Storage:** All configuration options are stored locally in the user's browser.
+
+### 12. 💬 Unified Chat Workspace & Multi-File Ingestion
+- **Full Conversational Interface:** Clean, dark-mode chat interface with threaded sessions and message history.
+- **Simultaneous Multi-File Upload:** Ingest screenshots, research papers, voice memos, and video snippets in a single turn.
+- **Tool Calling & Agentic Loop:** Supports automated search, document querying, and scratchpad reasoning.
+
+### 13. 🎨 Text-to-Image Generation Engine
+- **Hugging Face Inference API Integration:** Support for open image models including `stable-diffusion-3.5-medium`, `stable-diffusion-inpainting`, and `FLUX.1-dev`.
+- **NVIDIA NIM Integration:** Support for `sdxl` and `flux-dev` via high-speed cloud acceleration.
+- **Natural Language Triggering:** Simply ask in chat *"Generate an image of..."* to invoke the image routing subsystem.
+
+### 14. 🔎 Deep Research & Autonomous Web Crawling
+- **Integrated SearXNG Meta-Search:** Private, self-hosted web search engine integration for live external grounding.
+- **Automated Source Synthesis:** Crawls, sanitizes (via `nh3`), and summarizes multi-source research into clean, cited markdown reports.
+
+### 15. 🧠 Local Vector Memory & RAG
+- **FastEmbed & ChromaDB Integration:** Lightweight local ONNX embeddings (`sentence-transformers/all-MiniLM-L6-v2`) and vector storage.
+- **Semantic Long-Term Memory:** Automatically recalls relevant past user conversations and personal document knowledge.
+
+### 16. 🗂️ Built-in Workspace Productivity Suite
+- **Notes & Tasks:** Integrated task manager and markdown note-taking workspace.
+- **Calendar & CalDAV Sync:** Native `.ics` import/export and bi-directional CalDAV synchronization.
+- **Gallery & Media Manager:** Centralized repository for viewing and transforming all uploaded and generated media assets.
+
+---
+
 ## 🎨 Multimodal Capabilities
 
 | Modality | Supported Operations | Typical Input Formats | Processing Method |
