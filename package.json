@@ -6,6 +6,6 @@
     "url": "https://github.com/bhanuatla521-svg/multivision-ai"
   },
   "devDependencies": {
-    "@antithesishq/bombadil": "^0.6.1"
+    "@antithesishq/bombadil": "^0.7.2"
   }
 }
